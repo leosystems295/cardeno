@@ -530,36 +530,49 @@ p { margin: 0 0 1em; }
   .index__row .btn { justify-self: start; margin-top: 6px; }
 }
 
-/* ---------- Satz-Formular: «Ich fahre einen …» ---------- */
-.finder-line { margin-top: clamp(48px, 7vw, 88px); padding-top: clamp(28px, 4vw, 44px); border-top: 1px solid var(--line-strong); }
-.finder-line__text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; font-size: clamp(1.7rem, 4vw, 3.1rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.15; color: #fff; }
-.finder-line select {
-  appearance: none; -webkit-appearance: none; cursor: pointer; font: inherit; letter-spacing: inherit; color: var(--blue-soft);
-  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='14' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%237db1ff' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 4px center;
-  border: 0; border-bottom: 3px solid var(--blue); border-radius: 0; padding: 0 40px 4px 2px; min-width: 7ch; max-width: 100%;
-}
-.finder-line select:disabled { color: #4d5d7a; border-bottom-color: var(--line-strong); cursor: not-allowed; }
-.finder-line select:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 6px; }
-.finder-line select option { background: #0c1424; color: #fff; font-size: 1rem; }
-.finder-line .btn { margin-top: 28px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* ---------- Marken als Schriftzug ---------- */
-.cloud { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px clamp(18px, 3vw, 40px); }
-.cloud a { display: inline-block; font-size: clamp(1.9rem, 4.6vw, 3.6rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1.15; color: transparent; -webkit-text-stroke: 1.5px #5f86c9; text-decoration: none; transition: color .15s ease, -webkit-text-stroke-color .15s ease; }
-.cloud a:hover, .cloud a:focus-visible { color: #fff; -webkit-text-stroke-color: #fff; }
+.kicker { margin: 0 0 14px; color: var(--blue-soft); font-size: .85rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
 
-/* ---------- Über mich (Startseite) ---------- */
-.statement { display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(32px, 6vw, 96px); align-items: end; }
-.statement h2 { font-size: clamp(2.4rem, 6.2vw, 5rem); letter-spacing: -0.045em; line-height: 1; }
-@media (max-width: 860px) { .statement { grid-template-columns: 1fr; } }
+/* ---------- Fahrzeug wählen: Formular neben Detailbild ---------- */
+.fsplit-sec { overflow: hidden; }
+.fsplit { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
+.fsplit__img { position: relative; aspect-ratio: 5 / 4; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-strong); box-shadow: 0 30px 80px -30px rgba(47,123,255,.35); }
+.fsplit__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fsplit__img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,6,10,0) 55%, rgba(4,6,10,.55)); pointer-events: none; }
+.fsplit__body h2 { font-size: clamp(2.2rem, 4.6vw, 3.6rem); letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 14px; }
+.finder-card { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: end; }
+.finder-card .btn { grid-column: 1 / -1; justify-content: center; }
+.fsplit__more { margin: 20px 0 0; color: var(--muted); font-size: .95rem; }
+.fsplit__chips { margin-top: 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.fsplit__chips span { width: 100%; color: var(--muted); font-size: .9rem; }
+.chip { display: inline-block; padding: 7px 14px; border: 1px solid var(--line-strong); border-radius: 999px; color: #dce4f2; font-size: .92rem; font-weight: 600; text-decoration: none; transition: border-color .15s ease, background .15s ease, color .15s ease; }
+.chip:hover, .chip:focus-visible { border-color: var(--blue); background: rgba(47,123,255,.14); color: #fff; }
+@media (max-width: 900px) {
+  .fsplit { grid-template-columns: 1fr; }
+  .fsplit__img { aspect-ratio: 16 / 10; }
+}
+@media (max-width: 520px) { .finder-card { grid-template-columns: 1fr; } }
 
-/* ---------- CTA mit Auto ---------- */
-.cta-band--car { background: linear-gradient(90deg, rgba(4,6,10,.94) 0%, rgba(4,6,10,.62) 52%, rgba(4,6,10,.2) 100%), url("../images/hero-lambo.jpg") 78% 82% / 150% auto no-repeat, var(--ink); padding-block: clamp(72px, 10vw, 140px); }
-.cta-band--car::before { display: none; }
-.cta-band--car p { color: #c3cde0; }
-.cta-band--car .btn--white { background: var(--blue-strong); color: #fff; }
-.cta-band--car .btn--white:hover { background: var(--blue); box-shadow: 0 0 0 5px rgba(47,123,255,.3); }
-@media (max-width: 900px) { .cta-band--car { background-size: 260% auto; background-position: 62% 100%; } }
+/* ---------- Schluss-Abschnitt mit ganzem Auto ---------- */
+.closer { position: relative; isolation: isolate; overflow: hidden; min-height: clamp(520px, 78vh, 720px); display: flex; align-items: center; border-top: 1px solid var(--line-strong); background: var(--ink); }
+.closer__img { position: absolute; inset: 0; z-index: -1; background:
+  radial-gradient(60% 70% at 78% 62%, rgba(47,123,255,.22), rgba(47,123,255,0) 70%),
+  linear-gradient(90deg, rgba(4,6,10,.97) 0%, rgba(4,6,10,.8) 34%, rgba(4,6,10,.12) 70%, rgba(4,6,10,.35) 100%),
+  linear-gradient(0deg, rgba(4,6,10,.85), rgba(4,6,10,0) 35%),
+  url("../images/hero-lambo.jpg") 62% 70% / cover no-repeat; filter: brightness(1.5) saturate(1.1); }
+.closer__in { padding-block: clamp(64px, 9vw, 120px); }
+.closer__in h2 { font-size: clamp(2.8rem, 8vw, 6.4rem); letter-spacing: -0.05em; line-height: .98; margin-bottom: 22px; }
+.closer__in .lead { max-width: 34ch; color: #cfd8ea; }
+.closer__btns { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+@media (max-width: 760px) {
+  .closer { display: block; min-height: 0; }
+  .closer__img { position: relative; inset: auto; z-index: 0; height: 66vw; min-height: 240px; margin-bottom: -40px; filter: brightness(1.5) saturate(1.1);
+    background:
+      linear-gradient(0deg, rgba(4,6,10,1) 0%, rgba(4,6,10,0) 45%),
+      linear-gradient(90deg, rgba(4,6,10,.7), rgba(4,6,10,0) 30%),
+      url("../images/hero-lambo.jpg") 66% 62% / cover no-repeat; }
+  .closer__in { padding-block: 0 56px; position: relative; }
+}
 
 @media (prefers-reduced-motion: reduce) { .js .sh__img { opacity: 1; animation: none; } .index__row:hover .index__big { transform: none; } }
