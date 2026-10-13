@@ -19,9 +19,8 @@ window.CARDENO_CONFIG = {
   email: "",            // z. B. "info@cardeno.ch"
 
   // Fahrzeug-Inserate: komplette Links zu den eigenen Händler-Seiten.
-  // Solange hier nichts steht, führen die Buttons zur Startseite von AutoScout24 bzw. MotoScout24.
-  autoscout: "",        // z. B. "https://www.autoscout24.ch/de/s/seller-12345"
-  motoscout: "",        // z. B. "https://www.motoscout24.ch/de/s/seller-12345"
+  autoscout: "https://www.autoscout24.ch/de/s/seller-3096174",
+  motoscout: "https://www.motoscout24.ch/de/s/seller-3096174",
 
   // Social Media (komplette Links)
   instagram: "",        // z. B. "https://www.instagram.com/…"
