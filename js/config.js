@@ -43,5 +43,12 @@ window.CARDENO_CONFIG = {
     - Mit Formular-Dienst (z. B. Formspree): Endpoint-URL hier eintragen, dann werden
       Anfragen direkt im Hintergrund gesendet.
   */
-  formEndpoint: ""
+  formEndpoint: "",
+
+  /*
+    Statistik (optional): Komplette Script-URL des Statistik-Dienstes.
+    Das Skript wird erst geladen, wenn Besucher im Cookie-Hinweis «Statistik» erlauben.
+    Leer lassen = keine Statistik.
+  */
+  analytics: ""
 };
