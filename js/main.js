@@ -109,14 +109,35 @@
   }
   $$("form[data-request]").forEach(setupForm);
 
+  /* ---------- Startseite: Stage-Auswahl im Hero (Scheinwerfer leuchten stärker) ---------- */
+  var hero = $(".sh");
+  if (hero) {
+    var STAGE_TEXT = {
+      1: "Software bei serienmässiger Hardware. Mehr Leistung, ohne Umbau am Fahrzeug.",
+      2: "Software und passende Hardware, etwa Abgasanlage oder Ansaugung.",
+      3: "Umfassende Optimierung für Spezialprojekte und Rennstrecke."
+    };
+    var stageBtns = $$(".sh__pick button", hero);
+    var stageTag = $(".sh__tag b", hero);
+    var stageDesc = $(".sh__desc", hero);
+    var setStage = function (n) {
+      hero.setAttribute("data-stage", n);
+      stageBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-stage") === String(n))); });
+      stageTag.textContent = "Stage " + n;
+      stageDesc.textContent = STAGE_TEXT[n];
+    };
+    stageBtns.forEach(function (b) { b.addEventListener("click", function () { setStage(b.getAttribute("data-stage")); }); });
+    window.setTimeout(function () { hero.classList.add("is-lit"); }, 900);
+  }
+
   /* ---------- Startseite: Fahrzeug-Finder ---------- */
   var finder = $("#finder");
   if (finder && BRANDS.length) {
     var sMarke = $("#finder-marke"), sModell = $("#finder-modell");
-    sMarke.innerHTML = '<option value="">Marke wählen</option>' + BRANDS.map(function (b) { return '<option value="' + b.id + '">' + esc(b.name) + "</option>"; }).join("");
+    sMarke.innerHTML = '<option value="">Marke</option>' + BRANDS.map(function (b) { return '<option value="' + b.id + '">' + esc(b.name) + "</option>"; }).join("");
     sMarke.addEventListener("change", function () {
       var b = find(sMarke.value);
-      sModell.innerHTML = '<option value="">' + (b ? "Modell wählen (optional)" : "Zuerst Marke wählen") + "</option>" +
+      sModell.innerHTML = '<option value="">' + (b ? "Modell (optional)" : "Modell") + "</option>" +
         (b ? b.models.map(function (m) { return '<option value="' + m.id + '">' + esc(m.name) + "</option>"; }).join("") : "");
       sModell.disabled = !b;
     });
