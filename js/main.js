@@ -118,12 +118,10 @@
       3: "Umfassende Optimierung für Spezialprojekte und Rennstrecke."
     };
     var stageBtns = $$(".sh__pick button", hero);
-    var stageTag = $(".sh__tag b", hero);
     var stageDesc = $(".sh__desc", hero);
     var setStage = function (n) {
       hero.setAttribute("data-stage", n);
       stageBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-stage") === String(n))); });
-      stageTag.textContent = "Stage " + n;
       stageDesc.textContent = STAGE_TEXT[n];
     };
     stageBtns.forEach(function (b) { b.addEventListener("click", function () { setStage(b.getAttribute("data-stage")); }); });
