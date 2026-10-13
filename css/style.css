@@ -467,7 +467,7 @@ p { margin: 0 0 1em; }
 .sh__tag b { position: absolute; left: 10px; bottom: 5.5cqw; white-space: nowrap; font-size: .85rem; font-weight: 700; letter-spacing: .01em; color: #fff; padding: 5px 10px; border-radius: 6px; background: rgba(8,13,22,.7); border: 1px solid rgba(125,177,255,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .js .sh:not(.is-lit) .sh__tag { opacity: 0; }
 
-.sh__copy { position: absolute; inset: 0 0 var(--bar-h) 0; display: flex; flex-direction: column; justify-content: flex-start; padding-top: clamp(40px, 7vh, 84px); text-align: center; pointer-events: none; }
+.sh__copy { position: absolute; inset: 0 0 var(--bar-h) 0; display: flex; flex-direction: column; justify-content: flex-start; padding-top: clamp(48px, 9vh, 110px); text-align: center; pointer-events: none; }
 .sh__copy > * { pointer-events: auto; }
 .sh__copy h1 { font-size: clamp(2.3rem, 4.6vw, 4.4rem); max-width: 17ch; margin: 0 auto 18px; }
 .sh__copy .lead { margin: 0 auto 26px; max-width: 52ch; }
@@ -516,25 +516,29 @@ p { margin: 0 0 1em; }
   .sh__bar-in .btn { text-align: center; }
 }
 
-/* ---------- Angebot als typografisches Inhaltsverzeichnis ---------- */
-.index { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--line-strong); }
+/* ---------- Angebot als Inhaltsverzeichnis ---------- */
+.index { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--line-strong); counter-reset: ix; }
 .index__row {
-  position: relative; display: grid; grid-template-columns: max-content minmax(0, 1fr) auto; align-items: center; gap: 16px clamp(20px, 4vw, 56px);
-  padding: clamp(22px, 3vw, 34px) 0; border-top: 1px solid var(--line-strong); isolation: isolate;
+  position: relative; display: grid; grid-template-columns: 3.2rem minmax(0, 1.5fr) minmax(0, 1fr) 17.5rem; align-items: center; gap: 16px clamp(16px, 3vw, 40px);
+  padding: clamp(26px, 3.4vw, 40px) 0; border-top: 1px solid var(--line-strong); isolation: isolate; counter-increment: ix;
 }
 .index__row::before { content: ""; position: absolute; inset: 0 calc(var(--gutter) * -1); z-index: -1; background: linear-gradient(90deg, rgba(47,123,255,.16), rgba(47,123,255,0) 75%); opacity: 0; transition: opacity .25s ease; }
 .index__row:hover::before, .index__row:focus-within::before { opacity: 1; }
-.index__big { display: block; font-size: clamp(2.3rem, 5.2vw, 5rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1; color: #fff; transition: transform .25s ease, color .25s ease; }
+.index__big { grid-column: 2; display: block; font-size: clamp(2.3rem, 4.4vw, 4rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1; color: #fff; transition: transform .25s ease, color .25s ease; }
+.index__big::before { content: "0" counter(ix); position: absolute; left: 0; top: 50%; transform: translateY(-50%); font-size: .95rem; font-weight: 600; letter-spacing: .08em; color: var(--blue-soft); }
 .index__row:hover .index__big, .index__row:focus-within .index__big { transform: translateX(10px); color: var(--blue-soft); }
-.index__row p { margin: 0; color: #bcc7dc; max-width: 40ch; justify-self: end; }
+.index__row p { margin: 0; color: #bcc7dc; max-width: 36ch; }
+.index__row .btn { justify-content: space-between; width: 100%; white-space: nowrap; }
+.index__row .btn::after { content: "\2192"; margin-left: 14px; font-weight: 400; font-size: 1.15em; transition: transform .2s ease; }
+.index__row .btn:hover::after { transform: translateX(4px); }
 @media (max-width: 900px) {
-  .index__row { grid-template-columns: 1fr; gap: 12px; }
-  .index__row p { justify-self: start; }
-  .index__row .btn { justify-self: start; margin-top: 6px; }
+  .index__row { grid-template-columns: 1fr; gap: 10px; padding-block: 26px; }
+  .index__big { grid-column: 1; }
+  .index__big::before { position: static; display: block; transform: none; margin-bottom: 10px; }
+  .index__row .btn { width: auto; justify-self: start; margin-top: 8px; }
 }
 
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-
 .kicker { margin: 0 0 14px; color: var(--blue-soft); font-size: .85rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
 
 /* ---------- Fahrzeug wählen: Formular neben Detailbild ---------- */
@@ -560,21 +564,16 @@ p { margin: 0 0 1em; }
 /* ---------- Schluss-Abschnitt mit ganzem Auto ---------- */
 .closer { position: relative; isolation: isolate; overflow: hidden; min-height: clamp(520px, 78vh, 720px); display: flex; align-items: center; border-top: 1px solid var(--line-strong); background: var(--ink); }
 .closer__img { position: absolute; inset: 0; z-index: -1; background:
-  radial-gradient(60% 70% at 78% 62%, rgba(47,123,255,.22), rgba(47,123,255,0) 70%),
-  linear-gradient(90deg, rgba(4,6,10,.97) 0%, rgba(4,6,10,.8) 34%, rgba(4,6,10,.12) 70%, rgba(4,6,10,.35) 100%),
-  linear-gradient(0deg, rgba(4,6,10,.85), rgba(4,6,10,0) 35%),
-  url("../images/hero-lambo.jpg") 62% 70% / cover no-repeat; filter: brightness(1.5) saturate(1.1); }
+  linear-gradient(90deg, rgba(4,6,10,.55) 0%, rgba(4,6,10,0) 45%),
+  url("../images/closer-lambo.jpg") 75% 100% / cover no-repeat; }
 .closer__in { padding-block: clamp(64px, 9vw, 120px); }
 .closer__in h2 { font-size: clamp(2.8rem, 8vw, 6.4rem); letter-spacing: -0.05em; line-height: .98; margin-bottom: 22px; }
 .closer__in .lead { max-width: 34ch; color: #cfd8ea; }
 .closer__btns { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
 @media (max-width: 760px) {
   .closer { display: block; min-height: 0; }
-  .closer__img { position: relative; inset: auto; z-index: 0; height: 66vw; min-height: 240px; margin-bottom: -40px; filter: brightness(1.5) saturate(1.1);
-    background:
-      linear-gradient(0deg, rgba(4,6,10,1) 0%, rgba(4,6,10,0) 45%),
-      linear-gradient(90deg, rgba(4,6,10,.7), rgba(4,6,10,0) 30%),
-      url("../images/hero-lambo.jpg") 66% 62% / cover no-repeat; }
+  .closer__img { position: relative; inset: auto; z-index: 0; height: 75vw; margin-bottom: -40px;
+    background: linear-gradient(0deg, rgba(4,6,10,1) 0%, rgba(4,6,10,0) 28%), url("../images/hero-lambo-m.jpg") center / 100% 100% no-repeat; }
   .closer__in { padding-block: 0 56px; position: relative; }
 }
 
