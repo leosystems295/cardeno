@@ -140,37 +140,19 @@ p { margin: 0 0 1em; }
   .nav .nav-cta { display: block; text-align: center; }
 }
 
-/* ---------- Hero ---------- */
-.hero, .page-hero { position: relative; background: var(--ink); overflow: hidden; isolation: isolate; }
-.hero::before, .page-hero::before {
+/* ---------- Unterseiten-Kopf (Grundlage) ---------- */
+.page-hero { position: relative; background: var(--ink); overflow: hidden; isolation: isolate; }
+.page-hero::before {
   content: ""; position: absolute; inset: 0; z-index: -2;
   background-image:
     linear-gradient(rgba(47,123,255,.09) 1px, transparent 1px),
     linear-gradient(90deg, rgba(47,123,255,.09) 1px, transparent 1px);
   background-size: 56px 56px;
-  -webkit-mask-image: radial-gradient(ellipse 80% 90% at 78% 40%, #000 0%, transparent 72%);
-  mask-image: radial-gradient(ellipse 80% 90% at 78% 40%, #000 0%, transparent 72%);
 }
-.hero::after, .page-hero::after {
+.page-hero::after {
   content: ""; position: absolute; z-index: -1; right: -12%; top: -30%; width: 70%; aspect-ratio: 1;
   background: radial-gradient(closest-side, rgba(31,99,232,.42), rgba(31,99,232,0) 100%);
   pointer-events: none;
-}
-.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(32px, 5vw, 80px); align-items: center; padding-block: clamp(56px, 8vw, 112px); min-height: min(80vh, 760px); }
-.hero h1 { margin-bottom: 24px; max-width: 14ch; }
-.hero .lead { margin-bottom: 34px; }
-
-.hero__mark { justify-self: center; width: min(100%, 440px); }
-.hero__mark svg { width: 100%; height: auto; overflow: visible; display: block; filter: drop-shadow(0 0 38px rgba(47,123,255,.35)); }
-.hero__mark .draw { fill: rgba(47,123,255,0); stroke: var(--blue-soft); stroke-width: 3; stroke-linejoin: round; }
-.js .hero__mark .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.7s cubic-bezier(.6,.05,.25,1) .2s forwards, fill-in .9s ease 1.5s forwards; }
-@keyframes draw { to { stroke-dashoffset: 0; } }
-@keyframes fill-in { to { fill: var(--blue); stroke: var(--blue); } }
-
-@media (max-width: 900px) {
-  .hero .wrap { grid-template-columns: 1fr; min-height: 0; }
-  .hero__mark { position: absolute; right: -14%; top: 4%; width: 78%; opacity: .16; z-index: -1; pointer-events: none; }
-  .hero h1 { max-width: none; }
 }
 
 /* ---------- Sektionen ---------- */
@@ -204,19 +186,19 @@ p { margin: 0 0 1em; }
 @media (max-width: 760px) { .facts { grid-template-columns: 1fr; } }
 
 /* ---------- Stages ---------- */
-.stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.stage {
-  position: relative; padding: clamp(24px, 3vw, 36px); border-radius: var(--r-card);
-  border: 1px solid var(--line); background: linear-gradient(170deg, var(--panel-2), var(--panel) 60%);
-  display: flex; flex-direction: column;
-}
-.stage:nth-child(3) { border-color: rgba(47,123,255,.55); box-shadow: 0 0 0 1px rgba(47,123,255,.2), 0 20px 60px -20px rgba(47,123,255,.4); }
+.stages { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line-strong); }
+.stage { position: relative; padding: 34px clamp(20px, 3vw, 40px) 40px 0; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+.stage + .stage { padding-left: clamp(20px, 3vw, 40px); }
+.stage:last-child { border-right: 0; padding-right: 0; }
 .stage .ebars { margin-bottom: 26px; }
-.stage h3 { font-size: clamp(1.9rem, 3vw, 2.5rem); margin-bottom: 12px; }
-.stage p { margin: 0; color: #bcc7dc; }
+.stage h3 { font-size: clamp(2rem, 3.4vw, 3rem); letter-spacing: -0.04em; margin-bottom: 14px; }
+.stage p { margin: 0; color: #bcc7dc; max-width: 36ch; }
 .stage .stage-for { margin-top: auto; padding-top: 22px; font-size: .95rem; color: var(--muted); }
 .stage .stage-for strong { color: var(--blue-soft); }
-@media (max-width: 860px) { .stages { grid-template-columns: 1fr; } }
+@media (max-width: 860px) {
+  .stages { grid-template-columns: 1fr; }
+  .stage, .stage + .stage { padding: 30px 0 34px; border-right: 0; border-bottom: 1px solid var(--line); }
+}
 
 /* ---------- Marken ---------- */
 .brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; list-style: none; margin: 0; padding: 0; }
@@ -438,3 +420,146 @@ p { margin: 0 0 1em; }
 .vehicle--wide > div { max-width: 62ch; }
 .vehicle--wide .btn { margin-top: 0; }
 .badge-panel svg { position: relative; width: 46%; height: auto; stroke: var(--blue-soft); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 24px rgba(47,123,255,.5)); }
+
+/* ==========================================================================
+   Startseite: Hero mit Lamborghini. Die Scheinwerfer leuchten je nach Stage stärker.
+   ========================================================================== */
+.sh {
+  --bar-h: 112px;
+  --hero-h: clamp(680px, calc(100svh - 112px), 900px);
+  --nx: 57.5%; --ny: 71.7%;      /* nahes Tagfahrlicht */
+  --fx: 42%;   --fy: 68.8%;      /* fernes Tagfahrlicht */
+  --ls: 1;                        /* Skalierung der Leuchten */
+  --a-near: .55; --a-far: 0; --a-road: 0; --a-tint: 0;
+  position: relative; height: var(--hero-h); background: var(--ink); overflow: hidden; isolation: isolate;
+}
+.sh[data-stage="2"] { --a-near: .9; --a-far: .7; --a-road: 0; --a-tint: .25; }
+.sh[data-stage="3"] { --a-near: 1; --a-far: 1; --a-road: .85; --a-tint: .55; }
+
+.sh__scene { position: absolute; inset: 0 0 var(--bar-h) 0; z-index: -1; }
+.sh__frame {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: max(100%, calc((var(--hero-h) - var(--bar-h)) * 2)); aspect-ratio: 2 / 1; container-type: inline-size;
+}
+.sh__img { position: absolute; inset: 0; background: url("../images/hero-lambo.jpg") center / 100% 100% no-repeat; }
+.js .sh__img { opacity: 0; animation: sh-in 1.8s ease .1s forwards; }
+@keyframes sh-in { to { opacity: 1; } }
+
+.sh__light { position: absolute; pointer-events: none; border-radius: 50%; mix-blend-mode: screen; transform: translate(-50%, -50%); transition: opacity .9s ease; }
+.sh__light--near {
+  left: var(--nx); top: var(--ny); width: calc(24cqw * var(--ls)); height: calc(9cqw * var(--ls)); opacity: var(--a-near);
+  background: radial-gradient(closest-side, rgba(150,200,255,.95) 0%, rgba(47,123,255,.6) 30%, rgba(47,123,255,0) 100%);
+}
+.sh__light--far {
+  left: var(--fx); top: var(--fy); width: calc(11cqw * var(--ls)); height: calc(8cqw * var(--ls)); opacity: var(--a-far);
+  background: radial-gradient(closest-side, rgba(150,200,255,.9) 0%, rgba(47,123,255,.55) 30%, rgba(47,123,255,0) 100%);
+}
+.sh__light--road {
+  left: calc(var(--nx) + 3%); top: calc(var(--ny) + 17%); width: calc(52cqw * var(--ls)); height: calc(9cqw * var(--ls)); opacity: var(--a-road);
+  background: radial-gradient(closest-side, rgba(47,123,255,.6), rgba(47,123,255,0) 100%);
+}
+.sh__frame::after { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 80% at 60% 70%, rgba(31,99,232,.5), transparent 70%); mix-blend-mode: screen; opacity: var(--a-tint); transition: opacity .9s ease; pointer-events: none; }
+.js .sh:not(.is-lit) .sh__light, .js .sh:not(.is-lit) .sh__frame::after { opacity: 0; }
+
+.sh__tag { position: absolute; left: var(--nx); top: var(--ny); pointer-events: none; transition: opacity .6s ease .3s; }
+.sh__tag::before { content: ""; position: absolute; left: 0; bottom: 0; width: 1px; height: 11cqw; background: linear-gradient(0deg, var(--blue-soft), rgba(125,177,255,0)); }
+.sh__tag::after { content: ""; position: absolute; left: -3px; top: -3px; width: 7px; height: 7px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(47,123,255,.4), 0 0 14px 4px rgba(47,123,255,.8); }
+.sh__tag b { position: absolute; left: 10px; bottom: 11cqw; white-space: nowrap; font-size: .85rem; font-weight: 700; letter-spacing: .01em; color: #fff; padding: 5px 10px; border-radius: 6px; background: rgba(8,13,22,.7); border: 1px solid rgba(125,177,255,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.js .sh:not(.is-lit) .sh__tag { opacity: 0; }
+
+.sh__copy { position: absolute; inset: 0 0 var(--bar-h) 0; display: flex; flex-direction: column; justify-content: center; pointer-events: none; }
+.sh__copy > * { pointer-events: auto; }
+.sh__copy h1 { font-size: clamp(2.3rem, 4.5vw, 4.3rem); max-width: 11.5ch; margin-bottom: 22px; }
+.sh__copy .lead { margin-bottom: 30px; max-width: 40ch; }
+.sh__copy .wrap { }
+.sh__copy-in { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
+.sh__copy-in > * { max-width: 560px; }
+.sh__copy-in > h1 { max-width: 11.5ch; }
+
+.sh__bar { position: absolute; left: 0; right: 0; bottom: 0; height: var(--bar-h); border-top: 1px solid rgba(125,177,255,.2); background: linear-gradient(180deg, rgba(4,6,10,.6), rgba(4,6,10,.94)); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.sh__bar-in { height: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 20px clamp(20px, 3.5vw, 48px); }
+.sh__pick { display: flex; gap: 10px; }
+.sh__pick button {
+  display: inline-flex; align-items: center; gap: 12px; cursor: pointer; padding: 12px 18px; border-radius: var(--r-ctl);
+  background: transparent; border: 1px solid var(--line-strong); font-weight: 700; color: #c9d3e6; transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.sh__pick button:hover { border-color: var(--blue); color: #fff; }
+.sh__pick button[aria-pressed="true"] { border-color: var(--blue); background: rgba(47,123,255,.18); color: #fff; }
+.sh__pick .ebars { width: 24px; gap: 3px; }
+.sh__pick .ebars i { height: 4px; border-radius: 1px; }
+.sh__desc { margin: 0; color: #c3cde0; max-width: 46ch; }
+
+@media (max-width: 1060px) {
+  .sh__bar-in { grid-template-columns: 1fr auto; }
+  .sh__desc { grid-column: 1 / -1; grid-row: 2; display: none; }
+}
+
+@media (max-width: 900px) {
+  .sh { --nx: 39.3%; --ny: 67.4%; --fx: 10.3%; --fy: 64.5%; --ls: 1.7; height: auto; display: flex; flex-direction: column; }
+  .sh__copy { position: static; padding-block: clamp(40px, 9vw, 64px) 0; order: 1; pointer-events: auto; }
+  .sh__copy-in > * { max-width: none; }
+  .sh__copy h1 { max-width: none; font-size: clamp(2.1rem, 8.4vw, 3rem); }
+  .sh__scene { position: relative; inset: auto; order: 2; margin-top: 8px; }
+  .sh__frame { position: relative; left: auto; bottom: auto; transform: none; width: 100%; aspect-ratio: 4 / 3; }
+  .sh__img { background-image: url("../images/hero-lambo-m.jpg"); }
+  .sh__tag::before { height: 14cqw; }
+  .sh__tag b { bottom: 14cqw; font-size: .78rem; }
+  .sh__bar { position: relative; order: 3; height: auto; padding-block: 20px 26px; margin-top: -8px; }
+  .sh__bar-in { grid-template-columns: 1fr; height: auto; gap: 16px; }
+  .sh__pick { flex-wrap: wrap; }
+  .sh__pick button { flex: 1 1 0; justify-content: center; padding-inline: 8px; gap: 8px; white-space: nowrap; font-size: .92rem; }
+  .sh__pick .ebars { display: none; }
+  .sh__desc { display: block; grid-row: auto; }
+  .sh__bar-in .btn { text-align: center; }
+}
+
+/* ---------- Angebot als typografisches Inhaltsverzeichnis ---------- */
+.index { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--line-strong); }
+.index__row {
+  position: relative; display: grid; grid-template-columns: max-content minmax(0, 1fr) auto; align-items: center; gap: 16px clamp(20px, 4vw, 56px);
+  padding: clamp(22px, 3vw, 34px) 0; border-top: 1px solid var(--line-strong); isolation: isolate;
+}
+.index__row::before { content: ""; position: absolute; inset: 0 calc(var(--gutter) * -1); z-index: -1; background: linear-gradient(90deg, rgba(47,123,255,.16), rgba(47,123,255,0) 75%); opacity: 0; transition: opacity .25s ease; }
+.index__row:hover::before, .index__row:focus-within::before { opacity: 1; }
+.index__big { display: block; font-size: clamp(2.3rem, 5.2vw, 5rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1; color: #fff; transition: transform .25s ease, color .25s ease; }
+.index__row:hover .index__big, .index__row:focus-within .index__big { transform: translateX(10px); color: var(--blue-soft); }
+.index__row p { margin: 0; color: #bcc7dc; max-width: 40ch; justify-self: end; }
+@media (max-width: 900px) {
+  .index__row { grid-template-columns: 1fr; gap: 12px; }
+  .index__row p { justify-self: start; }
+  .index__row .btn { justify-self: start; margin-top: 6px; }
+}
+
+/* ---------- Satz-Formular: «Ich fahre einen …» ---------- */
+.finder-line { margin-top: clamp(48px, 7vw, 88px); padding-top: clamp(28px, 4vw, 44px); border-top: 1px solid var(--line-strong); }
+.finder-line__text { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 18px; font-size: clamp(1.7rem, 4vw, 3.1rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.15; color: #fff; }
+.finder-line select {
+  appearance: none; -webkit-appearance: none; cursor: pointer; font: inherit; letter-spacing: inherit; color: var(--blue-soft);
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='14' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%237db1ff' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 4px center;
+  border: 0; border-bottom: 3px solid var(--blue); border-radius: 0; padding: 0 40px 4px 2px; min-width: 7ch; max-width: 100%;
+}
+.finder-line select:disabled { color: #4d5d7a; border-bottom-color: var(--line-strong); cursor: not-allowed; }
+.finder-line select:focus-visible { outline: 3px solid var(--blue-soft); outline-offset: 6px; }
+.finder-line select option { background: #0c1424; color: #fff; font-size: 1rem; }
+.finder-line .btn { margin-top: 28px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Marken als Schriftzug ---------- */
+.cloud { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px clamp(18px, 3vw, 40px); }
+.cloud a { display: inline-block; font-size: clamp(1.9rem, 4.6vw, 3.6rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1.15; color: transparent; -webkit-text-stroke: 1.5px #5f86c9; text-decoration: none; transition: color .15s ease, -webkit-text-stroke-color .15s ease; }
+.cloud a:hover, .cloud a:focus-visible { color: #fff; -webkit-text-stroke-color: #fff; }
+
+/* ---------- Über mich (Startseite) ---------- */
+.statement { display: grid; grid-template-columns: 1.15fr .85fr; gap: clamp(32px, 6vw, 96px); align-items: end; }
+.statement h2 { font-size: clamp(2.4rem, 6.2vw, 5rem); letter-spacing: -0.045em; line-height: 1; }
+@media (max-width: 860px) { .statement { grid-template-columns: 1fr; } }
+
+/* ---------- CTA mit Auto ---------- */
+.cta-band--car { background: linear-gradient(90deg, rgba(4,6,10,.94) 0%, rgba(4,6,10,.62) 52%, rgba(4,6,10,.2) 100%), url("../images/hero-lambo.jpg") 78% 82% / 150% auto no-repeat, var(--ink); padding-block: clamp(72px, 10vw, 140px); }
+.cta-band--car::before { display: none; }
+.cta-band--car p { color: #c3cde0; }
+.cta-band--car .btn--white { background: var(--blue-strong); color: #fff; }
+.cta-band--car .btn--white:hover { background: var(--blue); box-shadow: 0 0 0 5px rgba(47,123,255,.3); }
+@media (max-width: 900px) { .cta-band--car { background-size: 260% auto; background-position: 62% 100%; } }
+
+@media (prefers-reduced-motion: reduce) { .js .sh__img { opacity: 1; animation: none; } .index__row:hover .index__big { transform: none; } }
