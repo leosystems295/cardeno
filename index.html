@@ -135,47 +135,46 @@
   </article>
 </div>
 
-    <form class="finder-line" id="finder" aria-label="Fahrzeug wählen">
-      <div class="finder-line__text">
-        <span>Ich fahre einen</span>
-        <label class="visually-hidden" for="finder-marke">Marke</label>
-        <select id="finder-marke"><option value="">Marke</option></select>
-        <label class="visually-hidden" for="finder-modell">Modell</label>
-        <select id="finder-modell" disabled><option value="">Modell</option></select>
-      </div>
-      <button class="btn" type="submit"><span>Leistungssteigerung anfragen</span></button>
-    </form>
-
-    <h3 style="margin:clamp(48px,7vw,88px) 0 20px;color:var(--muted);font-size:1.05rem;font-weight:600;letter-spacing:0">Oder wähle direkt deine Marke</h3>
-    <ul class="cloud"><li><a href="leistungssteigerung.html#audi">Audi</a></li><li><a href="leistungssteigerung.html#bmw">BMW</a></li><li><a href="leistungssteigerung.html#mercedes-benz">Mercedes-Benz</a></li><li><a href="leistungssteigerung.html#volkswagen">Volkswagen</a></li><li><a href="leistungssteigerung.html#porsche">Porsche</a></li><li><a href="leistungssteigerung.html#seat">Seat</a></li><li><a href="leistungssteigerung.html#skoda">Škoda</a></li><li><a href="leistungssteigerung.html#cupra">Cupra</a></li><li><a href="leistungssteigerung.html#mini">Mini</a></li><li><a href="leistungssteigerung.html#lamborghini">Lamborghini</a></li></ul>
-    <p style="margin:32px 0 0">Deine Marke fehlt? <a class="text-link" href="leistungssteigerung.html">Alle 46 Marken ansehen</a> oder <a class="text-link" href="kontakt.html">frag mich direkt</a>.</p>
   </div>
 </section>
 
-<section class="section" aria-labelledby="ueber-titel">
-  <div class="wrap statement">
-    <h2 id="ueber-titel">Du sprichst direkt mit mir.</h2>
-    <div>
-      <p class="lead">Ob Fahrzeugkauf, Leistungssteigerung oder Transport: Ich nehme mir Zeit für dich und sage dir offen, was möglich ist und was nicht.</p>
-      <ul class="ticks" style="margin-bottom:28px">
-        <li><strong>Persönlicher Kontakt</strong>Kein Callcenter. Du erreichst mich selbst.</li>
-        <li><strong>Ehrliche Beratung</strong>Du erfährst vorab, was bei deinem Fahrzeug sinnvoll ist.</li>
-      </ul>
+<section class="section fsplit-sec" aria-labelledby="finder-titel">
+  <div class="wrap fsplit">
+    <div class="fsplit__img" aria-hidden="true"><img src="images/lambo-detail.jpg" width="1000" height="800" alt="" loading="lazy"></div>
+    <div class="fsplit__body">
+      <p class="kicker">Dein Fahrzeug</p>
+      <h2 id="finder-titel">Was fährst du?</h2>
+      <p class="lead">Wähle Marke und Modell. Ich sage dir ehrlich, was bei deinem Fahrzeug möglich ist.</p>
+      <form class="finder-card" id="finder" aria-label="Fahrzeug wählen">
+        <div class="field">
+          <label for="finder-marke">Marke</label>
+          <select id="finder-marke"><option value="">Marke wählen</option></select>
+        </div>
+        <div class="field">
+          <label for="finder-modell">Modell</label>
+          <select id="finder-modell" disabled><option value="">Zuerst Marke wählen</option></select>
+        </div>
+        <button class="btn" type="submit"><span>Leistungssteigerung anfragen</span></button>
+      </form>
+      <div class="fsplit__chips"><span>Häufig angefragt</span><a class="chip" href="leistungssteigerung.html#audi">Audi</a><a class="chip" href="leistungssteigerung.html#bmw">BMW</a><a class="chip" href="leistungssteigerung.html#mercedes-benz">Mercedes-Benz</a><a class="chip" href="leistungssteigerung.html#volkswagen">Volkswagen</a><a class="chip" href="leistungssteigerung.html#porsche">Porsche</a><a class="chip" href="leistungssteigerung.html#seat">Seat</a></div>
+      <p class="fsplit__more">Deine Marke fehlt? <a class="text-link" href="leistungssteigerung.html">Alle 46 Marken ansehen</a> oder <a class="text-link" href="kontakt.html">frag mich direkt</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="closer" aria-labelledby="cta-titel">
+  <div class="closer__img" aria-hidden="true"></div>
+  <div class="wrap closer__in">
+    <p class="kicker">Kontakt</p>
+    <h2 id="cta-titel">Schreib mir direkt.</h2>
+    <p class="lead">Ob Fahrzeugkauf, Leistungssteigerung oder Transport: Du sprichst mit mir, nicht mit einem Callcenter. Ich melde mich so rasch wie möglich.</p>
+    <div class="closer__btns">
+      <a class="btn " href="kontakt.html"><span>Anfrage senden</span></a>
       <a class="btn btn--ghost" href="ueber-mich.html"><span>Mehr über mich</span></a>
     </div>
   </div>
 </section>
 
-
-<section class="cta-band cta-band--car" aria-labelledby="cta-titel">
-  <div class="wrap">
-    <div>
-      <h2 id="cta-titel">Fragen zu Fahrzeug, Leistung oder Transport?</h2>
-      <p>Schreib mir, was du suchst oder was du brauchst. Ich melde mich so rasch wie möglich.</p>
-    </div>
-    <a class="btn btn--white" href="kontakt.html"><span>Anfrage senden</span></a>
-  </div>
-</section>
 
 </main>
 
