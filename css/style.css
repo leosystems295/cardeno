@@ -529,13 +529,18 @@ p { margin: 0 0 1em; }
 .index__row:hover .index__big, .index__row:focus-within .index__big { transform: translateX(10px); color: var(--blue-soft); }
 .index__row p { margin: 0; color: #bcc7dc; max-width: 36ch; }
 .index__row .btn { justify-content: space-between; width: 100%; white-space: nowrap; }
-.index__row .btn::after { content: "\2192"; margin-left: 14px; font-weight: 400; font-size: 1.15em; transition: transform .2s ease; }
+.index__row .btn::after { content: "\2192"; margin-left: 12px; font-weight: 400; font-size: 1.15em; transition: transform .2s ease; }
 .index__row .btn:hover::after { transform: translateX(4px); }
-@media (max-width: 900px) {
-  .index__row { grid-template-columns: 1fr; gap: 10px; padding-block: 26px; }
-  .index__big { grid-column: 1; }
+@media (max-width: 1040px) {
+  .index__row { grid-template-columns: 2.6rem minmax(0, 1fr); grid-template-rows: auto auto auto; gap: 10px clamp(14px, 2.4vw, 32px); }
+  .index__big { grid-row: 1; }
+  .index__row p { grid-column: 2; grid-row: 2; max-width: 52ch; }
+  .index__row .btn { grid-column: 2; grid-row: 3; justify-self: start; width: auto; margin-top: 10px; }
+}
+@media (max-width: 640px) {
+  .index__row { grid-template-columns: 1fr; grid-template-rows: auto; padding-block: 26px; }
+  .index__big, .index__row p, .index__row .btn { grid-column: 1; grid-row: auto; }
   .index__big::before { position: static; display: block; transform: none; margin-bottom: 10px; }
-  .index__row .btn { width: auto; justify-self: start; margin-top: 8px; }
 }
 
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -544,8 +549,8 @@ p { margin: 0 0 1em; }
 /* ---------- Fahrzeug wählen: Formular neben Detailbild ---------- */
 .fsplit-sec { overflow: hidden; }
 .fsplit { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
-.fsplit__img { position: relative; aspect-ratio: 5 / 4; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-strong); box-shadow: 0 30px 80px -30px rgba(47,123,255,.35); }
-.fsplit__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.fsplit__img { position: relative; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-strong); box-shadow: 0 30px 80px -30px rgba(47,123,255,.35); }
+.fsplit__img img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 68%; display: block; }
 .fsplit__img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4,6,10,0) 55%, rgba(4,6,10,.55)); pointer-events: none; }
 .fsplit__body h2 { font-size: clamp(2.2rem, 4.6vw, 3.6rem); letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 14px; }
 .finder-card { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: end; }
@@ -564,16 +569,15 @@ p { margin: 0 0 1em; }
 /* ---------- Schluss-Abschnitt mit ganzem Auto ---------- */
 .closer { position: relative; isolation: isolate; overflow: hidden; min-height: clamp(520px, 78vh, 720px); display: flex; align-items: center; border-top: 1px solid var(--line-strong); background: var(--ink); }
 .closer__img { position: absolute; inset: 0; z-index: -1; background:
-  linear-gradient(90deg, rgba(4,6,10,.55) 0%, rgba(4,6,10,0) 45%),
-  url("../images/closer-lambo.jpg") 75% 100% / cover no-repeat; }
+  url("../images/closer-bmw.jpg") 70% 60% / cover no-repeat; }
 .closer__in { padding-block: clamp(64px, 9vw, 120px); }
-.closer__in h2 { font-size: clamp(2.8rem, 8vw, 6.4rem); letter-spacing: -0.05em; line-height: .98; margin-bottom: 22px; }
+.closer__in h2 { font-size: clamp(2.8rem, 7.2vw, 5.8rem); letter-spacing: -0.05em; line-height: .98; margin-bottom: 22px; }
 .closer__in .lead { max-width: 34ch; color: #cfd8ea; }
 .closer__btns { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
 @media (max-width: 760px) {
   .closer { display: block; min-height: 0; }
   .closer__img { position: relative; inset: auto; z-index: 0; height: 75vw; margin-bottom: -40px;
-    background: linear-gradient(0deg, rgba(4,6,10,1) 0%, rgba(4,6,10,0) 28%), url("../images/hero-lambo-m.jpg") center / 100% 100% no-repeat; }
+    background: linear-gradient(0deg, rgba(4,6,10,1) 0%, rgba(4,6,10,0) 28%), url("../images/closer-bmw-m.jpg") center / 100% 100% no-repeat; }
   .closer__in { padding-block: 0 56px; position: relative; }
 }
 
