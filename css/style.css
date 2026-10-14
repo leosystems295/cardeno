@@ -766,7 +766,7 @@ p { margin: 0 0 1em; }
 @media (max-width: 640px) {
   .fsplit { gap: 0; background: var(--panel); border: 1px solid var(--line-strong); border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px -34px rgba(47,123,255,.45); }
   .fsplit__img { border: 0; border-radius: 0; box-shadow: none; aspect-ratio: 4 / 3; }
-  .fsplit__img img { object-position: 50% 74%; }
+  .fsplit__img img { object-position: 50% 62%; }
   .fsplit__img::after { background: linear-gradient(180deg, rgba(12,20,36,0) 62%, var(--panel)); }
   .fsplit__body { padding: 4px 18px 22px; }
   .fsplit__body h2 { font-size: 1.75rem; }
