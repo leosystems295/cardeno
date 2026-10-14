@@ -738,3 +738,21 @@ p { margin: 0 0 1em; }
   .footer-bottom ul { flex-wrap: wrap; gap: 6px 18px; }
   .footer-bottom .linklike { white-space: nowrap; }
 }
+
+
+/* ==========================================================================
+   HANDY: Doppelungen entfernen (Laptop bleibt unverändert)
+   ========================================================================== */
+@media (max-width: 640px) {
+  /* Die drei Angebote stehen schon im Hero – «Mein Angebot» würde sie wiederholen */
+  .sec-offer { display: none; }
+  /* Kontaktdaten oben nicht doppelt: Anruf-Button steht direkt im Hero */
+  body:has(.sh) .topbar { display: none; }
+  /* Stage-Bereich: Einleitung weglassen, die Karten erklären sich selbst */
+  .sec-stages .section-head .lead { display: none; }
+  .sec-stages .section-head { margin-bottom: 18px; }
+  /* Fusszeile: Logo-Text und Seitenliste wiederholen Menü und Startseite */
+  .footer-main > div:nth-child(1) p { display: none; }
+  .footer-main > div:nth-child(3) { display: none; }
+  .footer-main > div:nth-child(4) { grid-column: 1 / -1; }
+}
