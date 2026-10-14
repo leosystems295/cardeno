@@ -756,3 +756,26 @@ p { margin: 0 0 1em; }
   .footer-main > div:nth-child(3) { display: none; }
   .footer-main > div:nth-child(4) { grid-column: 1 / -1; }
 }
+
+
+/* ==========================================================================
+   HANDY: «Was fährst du?» und «Schreib mir direkt.» klar unterscheiden
+   - Fahrzeug-Wahl = Werkzeug in einer Karte (links ausgerichtet)
+   - Kontakt = Abschluss-Plakat (zentriert, weisser Hauptbutton)
+   ========================================================================== */
+@media (max-width: 640px) {
+  .fsplit { gap: 0; background: var(--panel); border: 1px solid var(--line-strong); border-radius: 16px; overflow: hidden; box-shadow: 0 24px 60px -34px rgba(47,123,255,.45); }
+  .fsplit__img { border: 0; border-radius: 0; box-shadow: none; aspect-ratio: 4 / 3; }
+  .fsplit__img img { object-position: 50% 74%; }
+  .fsplit__img::after { background: linear-gradient(180deg, rgba(12,20,36,0) 62%, var(--panel)); }
+  .fsplit__body { padding: 4px 18px 22px; }
+  .fsplit__body h2 { font-size: 1.75rem; }
+  .fsplit__body .lead { font-size: .98rem; }
+  .fsplit__more { font-size: .9rem; }
+
+  .closer__in { text-align: center; }
+  .closer__in .kicker { display: none; }
+  .closer__in .lead { margin-inline: auto; }
+  .closer__btns .btn:first-child { background: #fff; color: #0a2a73; }
+  .closer__btns .btn:first-child:hover { background: #fff; box-shadow: 0 0 0 5px rgba(255,255,255,.28); }
+}
