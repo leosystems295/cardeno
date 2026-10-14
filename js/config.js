@@ -10,13 +10,13 @@ window.CARDENO_CONFIG = {
   firma: "CARDENO",
 
   // Adresse
-  strasse: "",          // z. B. "Industriestrasse 1"
-  plz: "",              // z. B. "5000"
-  ort: "",              // z. B. "Aarau"
+  strasse: "Ausserdorfweg 461",
+  plz: "5325",
+  ort: "Leibstadt",
 
   // Kontakt
-  telefon: "",          // z. B. "+41 79 123 45 67"
-  email: "",            // z. B. "info@cardeno.ch"
+  telefon: "+41 76 509 22 22",
+  email: "info@cardeno.ch",
 
   // Fahrzeug-Inserate: komplette Links zu den eigenen Händler-Seiten.
   autoscout: "https://www.autoscout24.ch/de/s/seller-3096174",
@@ -28,8 +28,7 @@ window.CARDENO_CONFIG = {
 
   // Öffnungszeiten: je Zeile ["Tage", "Zeiten"]
   oeffnungszeiten: [
-    // ["Montag – Freitag", "08.00 – 12.00 | 13.00 – 17.30"],
-    // ["Samstag", "Nach Vereinbarung"]
+    ["Besuch", "Nur nach Vereinbarung"]
   ],
 
   // Impressum (optional)
