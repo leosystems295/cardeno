@@ -72,13 +72,13 @@
       </div>
 
       <div id="marken-detail" hidden>
-        <a class="back-link" href="#">← Alle Marken</a>
+        <a class="back-link" id="detail-back" href="#">← Alle Marken</a>
         <div class="brand-view__top">
-          <h2>Leistungs&shy;steigerung <span id="detail-name"></span></h2>
+          <h2 id="detail-titel"></h2>
           <span id="detail-count" style="color:var(--muted);font-weight:700"></span>
         </div>
-        <p class="lead" style="margin-bottom:28px">Wähle dein Modell aus. Dein Modell steht nicht in der Liste? Wähle «Anderes Modell» im Formular, ich prüfe es gerne.</p>
-        <ul class="model-list" id="modell-liste"></ul>
+        <p class="lead" id="detail-lead" style="margin-bottom:28px"></p>
+        <ul class="cards" id="karten"></ul>
 
         <section class="power" id="leistung" aria-labelledby="leistung-titel" aria-live="polite" hidden></section>
 
