@@ -92,15 +92,23 @@
         if (btn) btn.disabled = false;
       }
 
+      function openMail() {
+        var body = lines.join("\n") + (message ? "\n\n" + message : "") + "\n\nFreundliche Grüsse\n" + (fd.get("name") || "");
+        window.location.href = "mailto:" + CFG.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      }
+
       if (CFG.formEndpoint) {
         if (btn) btn.disabled = true;
         status.className = "form-status"; status.textContent = "Wird gesendet …";
+        fd.set("_zusammenfassung", lines.join("\n") + (message ? "\n\n" + message : ""));
         fetch(CFG.formEndpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } })
           .then(function (r) { if (!r.ok) throw new Error(r.status); form.reset(); done(true, "Danke für deine Anfrage. Ich melde mich so rasch wie möglich bei dir."); })
-          .catch(function () { done(false, "Das Senden hat nicht geklappt. Bitte versuche es später nochmals oder ruf mich an."); });
+          .catch(function () {
+            if (CFG.email) { openMail(); done(false, "Das direkte Senden hat nicht geklappt. Dein E-Mail-Programm hat sich geöffnet, sende die Nachricht dort ab, oder ruf mich an."); }
+            else done(false, "Das Senden hat nicht geklappt. Bitte versuche es später nochmals oder ruf mich an.");
+          });
       } else if (CFG.email) {
-        var body = lines.join("\n") + (message ? "\n\n" + message : "") + "\n\nFreundliche Grüsse\n" + (fd.get("name") || "");
-        window.location.href = "mailto:" + CFG.email + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        openMail();
         done(true, "Dein E-Mail-Programm hat sich geöffnet. Sende die vorbereitete Nachricht dort ab.");
       } else {
         done(false, "Das Formular ist noch nicht eingerichtet. Trage die E-Mail-Adresse in js/config.js ein.");
@@ -108,6 +116,7 @@
     });
   }
   $$("form[data-request]").forEach(setupForm);
+  if (/^https?:/.test(CFG.formEndpoint || "")) $$("[data-form-provider]").forEach(function (n) { n.hidden = false; });
 
   /* ---------- Startseite: Stage-Auswahl im Hero (Scheinwerfer leuchten stärker) ---------- */
   var hero = $(".sh");

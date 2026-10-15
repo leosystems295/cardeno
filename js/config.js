@@ -39,10 +39,12 @@ window.CARDENO_CONFIG = {
     Kontaktformular:
     - Leer lassen: Das Formular öffnet das E-Mail-Programm mit einer fertigen Nachricht
       an die oben eingetragene E-Mail-Adresse.
-    - Mit Formular-Dienst (z. B. Formspree): Endpoint-URL hier eintragen, dann werden
-      Anfragen direkt im Hintergrund gesendet.
+    - "/api/kontakt": Die Anfragen werden direkt im Hintergrund per E-Mail gesendet. Das braucht den
+      Webserver app.py (Render «Web Service»). Läuft die Seite ohne Webserver, öffnet sich automatisch
+      das E-Mail-Programm als Ersatz.
+    - Externer Formular-Dienst (z. B. Formspree): vollständige https-Adresse eintragen.
   */
-  formEndpoint: "",
+  formEndpoint: "/api/kontakt",
 
   /*
     Leistungsübersicht: Welche Stufen angezeigt werden. [1] = nur Stage 1, [1, 2, 3] = alle drei.
