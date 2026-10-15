@@ -66,6 +66,33 @@
   $$("[data-year]").forEach(function (n) { n.textContent = new Date().getFullYear(); });
   if (CFG.telefon || CFG.email || address) $$("[data-contact-empty]").forEach(function (n) { n.hidden = true; });
 
+  /* ---------- Bestätigung nach dem Senden ---------- */
+  function showThanks(name, email) {
+    var prev = document.activeElement;
+    var ov = document.createElement("div");
+    ov.className = "thanks";
+    ov.innerHTML =
+      '<div class="thanks__box" role="alertdialog" aria-modal="true" aria-labelledby="thanks-t" aria-describedby="thanks-d" tabindex="-1">' +
+      '<div class="thanks__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>' +
+      '<h2 id="thanks-t"></h2><p id="thanks-d"></p>' +
+      '<button type="button" class="btn">Schliessen</button></div>';
+    ov.querySelector("h2").textContent = name ? "Danke, " + name + "!" : "Anfrage erhalten!";
+    ov.querySelector("p").textContent = "Deine Nachricht ist bei mir angekommen. Ich melde mich so rasch wie möglich bei dir" + (email ? " unter " + email : "") + ".";
+    document.body.appendChild(ov);
+    document.body.classList.add("thanks-open");
+    var box = ov.querySelector(".thanks__box"), close = ov.querySelector("button");
+    function end() {
+      document.removeEventListener("keydown", onKey);
+      ov.remove(); document.body.classList.remove("thanks-open");
+      if (prev && prev.focus) try { prev.focus(); } catch (e) {}
+    }
+    function onKey(e) { if (e.key === "Escape" || e.key === "Enter" || e.key === "Tab") { e.preventDefault(); if (e.key === "Tab") close.focus(); else end(); } }
+    document.addEventListener("keydown", onKey);
+    close.addEventListener("click", end);
+    ov.addEventListener("click", function (e) { if (e.target === ov) end(); });
+    requestAnimationFrame(function () { ov.classList.add("is-in"); close.focus(); });
+  }
+
   /* ---------- Formulare ---------- */
   function setupForm(form) {
     var status = $(".form-status", form);
@@ -102,7 +129,12 @@
         status.className = "form-status"; status.textContent = "Wird gesendet …";
         fd.set("_zusammenfassung", lines.join("\n") + (message ? "\n\n" + message : ""));
         fetch(CFG.formEndpoint, { method: "POST", body: fd, headers: { Accept: "application/json" } })
-          .then(function (r) { if (!r.ok) throw new Error(r.status); form.reset(); done(true, "Danke für deine Anfrage. Ich melde mich so rasch wie möglich bei dir."); })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.status);
+            var first = String(fd.get("name") || "").trim().split(/\s+/)[0];
+            form.reset(); done(true, ""); status.textContent = "";
+            showThanks(first, fd.get("email"));
+          })
           .catch(function () {
             if (CFG.email) { openMail(); done(false, "Das direkte Senden hat nicht geklappt. Dein E-Mail-Programm hat sich geöffnet, sende die Nachricht dort ab, oder ruf mich an."); }
             else done(false, "Das Senden hat nicht geklappt. Bitte versuche es später nochmals oder ruf mich an.");
