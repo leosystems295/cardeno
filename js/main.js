@@ -156,7 +156,28 @@
     grid.innerHTML = BRANDS.map(function (b) {
       return '<li><a class="brand-tile" href="#' + b.id + '" data-initial="' + esc(b.name.charAt(0)) + '" data-name="' + esc(b.name.toLowerCase()) + '"><strong>' + esc(b.name) + "</strong><span>" + b.models.length + " Modelle</span></a></li>";
     }).join("");
-    sidebar.innerHTML = BRANDS.map(function (b) { return '<li><a href="#' + b.id + '" data-brand="' + b.id + '">' + esc(b.name) + "</a></li>"; }).join("");
+    /* Seitenliste: Marken, beim geöffneten Hersteller darunter alle Modelle (wie bei hmperformance.ch) */
+    function renderSidebar(brand, modelName) {
+      sidebar.innerHTML = BRANDS.map(function (b) {
+        var open = !!brand && b.id === brand.id;
+        var html = "<li" + (open ? ' class="is-open"' : "") + '><a href="#' + b.id + '" data-brand="' + b.id + '"' + (open ? ' aria-expanded="true"' : "") + (open && !modelName ? ' aria-current="true"' : "") + ">" + esc(b.name) + "</a>";
+        if (open) {
+          html += '<ul class="brand-nav__models">' + b.models.map(function (mo) {
+            return '<li><a href="#' + b.id + "/" + mo.id + '" data-model="' + esc(mo.name) + '"' + (mo.name === modelName ? ' aria-current="true"' : "") + ">" + esc(mo.name) + "</a></li>";
+          }).join("") + "</ul>";
+        }
+        return html + "</li>";
+      }).join("");
+      var cur = $('a[aria-current="true"]', sidebar), bA = $("li.is-open > a", sidebar);
+      if (bA) {
+        var base = sidebar.getBoundingClientRect().top;
+        var toBrand = bA.getBoundingClientRect().top - base - 6;
+        var toCur = cur ? cur.getBoundingClientRect().top - base : 0;
+        // Marke oben zeigen. Liegt das gewählte Modell weiter unten, so scrollen, dass es sichtbar bleibt.
+        sidebar.scrollTop += (cur && toCur - toBrand > sidebar.clientHeight - 70) ? toCur - sidebar.clientHeight / 2 : toBrand;
+      }
+    }
+    renderSidebar(null, "");
 
     if (search) search.addEventListener("input", function () {
       var q = search.value.trim().toLowerCase(), n = 0;
@@ -282,12 +303,18 @@
       fModell.value = name || "";
       $$("button", modelList).forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-name") === name)); });
       showPower(curBrand, name);
+      renderSidebar(curBrand, name);
       var target = (power && !power.hidden) ? power : $("#anfrage");
-      if (scroll) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (scroll) {
+        var mo = curBrand && curBrand.models.filter(function (x) { return x.name === name; })[0];
+        if (mo && history.replaceState) history.replaceState(null, "", "#" + curBrand.id + "/" + mo.id);
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
     fModell.addEventListener("change", function () {
       $$("button", modelList).forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-name") === fModell.value)); });
       showPower(curBrand, fModell.value);
+      renderSidebar(curBrand, fModell.value);
     });
 
     function route() {
@@ -295,7 +322,7 @@
       var brand = find(parts[0]);
       if (!brand) {
         view.hidden = true; overview.hidden = false; document.title = baseTitle;
-        $$("a", sidebar).forEach(function (a) { a.removeAttribute("aria-current"); });
+        renderSidebar(null, "");
         return;
       }
       overview.hidden = true; view.hidden = false;
@@ -307,7 +334,7 @@
       modelList.innerHTML = brand.models.map(function (m) { return '<li><button type="button" data-name="' + esc(m.name) + '" aria-pressed="false">' + esc(m.name) + "</button></li>"; }).join("");
       fModell.innerHTML = '<option value="">Modell wählen</option>' + brand.models.map(function (m) { return '<option value="' + esc(m.name) + '">' + esc(m.name) + "</option>"; }).join("") + '<option value="Anderes Modell">Anderes Modell</option>';
       $$("button", modelList).forEach(function (b) { b.addEventListener("click", function () { selectModel(b.getAttribute("data-name"), true); }); });
-      $$("a", sidebar).forEach(function (a) { if (a.getAttribute("data-brand") === brand.id) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
+      renderSidebar(brand, "");
       document.title = "Leistungssteigerung " + brand.name + " – CARDENO";
       var wanted = parts[1] ? brand.models.filter(function (m) { return m.id === parts[1]; })[0] : null;
       if (wanted) { selectModel(wanted.name, false); setTimeout(function () { (power && !power.hidden ? power : $("#anfrage")).scrollIntoView({ block: "start" }); }, 60); }
