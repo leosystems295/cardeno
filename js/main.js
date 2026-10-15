@@ -158,7 +158,6 @@
     var STAGES = (CFG.leistungStufen && CFG.leistungStufen.length) ? CFG.leistungStufen.slice().sort() : [1];
     var HINT = CFG.leistungHinweis || "Richtwerte. Die genauen Werte hängen von Motor, Baujahr, Zustand und Fahrzeug ab. Vor dem Auftrag sage ich dir ehrlich, was bei deinem Fahrzeug möglich ist.";
     var stage = 1;
-    var CAR = '<svg viewBox="0 0 120 50" aria-hidden="true" focusable="false"><path d="M7 36c0-4 2-6 6-7l16-4 13-11c2-2 5-3 8-3h26c4 0 7 1 10 4l9 9 14 3c4 1 6 3 6 8v5h-9a9 9 0 0 0-18 0H42a9 9 0 0 0-18 0H7z"/><path d="M45 15h22l-1 10H38zM72 15h4l9 10H73z"/><circle cx="33" cy="41" r="6"/><circle cx="94" cy="41" r="6"/></svg>';
 
     grid.innerHTML = BRANDS.map(function (b) {
       return '<li><a class="brand-tile" href="#' + b.id + '" data-initial="' + esc(b.name.charAt(0)) + '" data-name="' + esc(b.name.toLowerCase()) + '"><strong>' + esc(b.name) + "</strong><span>" + b.models.length + " Modelle</span></a></li>";
@@ -174,17 +173,24 @@
     });
 
     /* ----- Daten ----- */
+    var GENS = window.CARDENO_GENS || {};
     function gensOf(brand, model) {
-      var d = POWER[brand.id + "/" + model.id];
-      if (!d) return null;
-      var list = Array.isArray(d) ? [{ id: "alle", name: "", motoren: d }] : (d.generationen || []);
-      list = list.filter(function (g) { return g.motoren && g.motoren.length; });
-      list.forEach(function (g) {
+      var key = brand.id + "/" + model.id, d = POWER[key], names = GENS[key] || [];
+      var pl = !d ? [] : Array.isArray(d) ? [{ id: "alle", name: "", motoren: d }] : (d.generationen || []);
+      pl = pl.filter(function (g) { return g.motoren && g.motoren.length; });
+      pl.forEach(function (g) {
         g.id = g.id || slug(g.name);
         g.motoren.forEach(function (e) { e.id = e.id || slug(e.name); });
       });
-      return list.length ? list : null;
+      var list = names.map(function (g) {
+        var p = pl.filter(function (x) { return x.id === g.id; })[0];
+        return { id: g.id, name: g.name, jahre: g.jahre, motoren: p ? p.motoren : [] };
+      });
+      pl.forEach(function (p) { if (!list.some(function (g) { return g.id === p.id; })) list.push({ id: p.id, name: p.name || "", jahre: p.jahre || "", motoren: p.motoren }); });
+      return list.length > 1 || (list.length === 1 && list[0].motoren.length) ? list : null;
     }
+    function gfull(model, g) { return !g.name ? model.name : g.name.toLowerCase().indexOf(model.name.toLowerCase()) === 0 ? g.name : model.name + " " + g.name; }
+    function gtitle(model, g) { return !g.name ? model.name : g.name.toLowerCase().indexOf(model.name.toLowerCase()) === 0 ? g.name : model.name + " – " + g.name; }
     function kw(ps) { return Math.round(ps * 0.7355); }
     function pct(a, b) { return Math.round((b - a) / a * 100); }
     function sign(n) { return (n > 0 ? "+" : n < 0 ? "−" : "±") + Math.abs(n); }
@@ -200,9 +206,9 @@
           html += '<ul class="brand-nav__models">' + b.models.map(function (mo) {
             var isM = !!model && mo.id === model.id, gl = isM ? gensOf(b, mo) : null;
             var s = '<li><a href="#' + b.id + "/" + mo.id + '"' + (isM && !gen ? ' aria-current="true"' : "") + ">" + esc(mo.name) + "</a>";
-            if (gl && !(gl.length === 1 && !gl[0].name)) {
+            if (gl && gl.length > 1) {
               s += '<ul class="brand-nav__gens">' + gl.map(function (g) {
-                return '<li><a href="#' + b.id + "/" + mo.id + "/" + g.id + '"' + (gen && g.id === gen.id ? ' aria-current="true"' : "") + ">" + esc(mo.name + " – " + g.name) + "</a></li>";
+                return '<li><a href="#' + b.id + "/" + mo.id + "/" + g.id + '"' + (gen && g.id === gen.id ? ' aria-current="true"' : "") + ">" + esc(gtitle(mo, g)) + "</a></li>";
               }).join("") + "</ul>";
             }
             return s + "</li>";
@@ -222,7 +228,7 @@
 
     /* ----- Karten ----- */
     function mcard(href, title, sub, current) {
-      return '<li><a class="mcard" href="' + href + '"' + (current ? ' aria-current="true"' : "") + '><span class="mcard__img">' + CAR + "</span><strong>" + esc(title) + "</strong>" + (sub ? "<span>" + esc(sub) + "</span>" : "") + "</a></li>";
+      return '<li><a class="mcard" href="' + href + '"' + (current ? ' aria-current="true"' : "") + "><strong>" + esc(title) + "</strong>" + (sub ? "<span>" + esc(sub) + "</span>" : "") + "</a></li>";
     }
     function ecard(href, e) {
       var s = e.serie;
@@ -325,15 +331,14 @@
 
       var base = "#" + brand.id, mBase = model ? base + "/" + model.id : "", gBase = gen ? mBase + "/" + gen.id : "";
       var single = gens && gens.length === 1;
-      var gname = function (g) { return g && g.name ? " " + g.name : ""; };
-      var title, lead, count, backHref, backText, items = "", cls = "cards";
+            var title, lead, count, backHref, backText, items = "", cls = "cards";
       power.hidden = true; power.innerHTML = "";
 
       if (!model) {
         title = "Leistungssteigerung " + brand.name; count = brand.models.length + " Modelle";
         lead = "Wähle dein Modell aus. Dein Modell steht nicht in der Liste? Wähle «Anderes Modell» im Formular, ich prüfe es gerne.";
         backHref = "#"; backText = "← Alle Marken";
-        items = brand.models.map(function (m) { var g = gensOf(brand, m); return mcard(base + "/" + m.id, m.name, g && !(g.length === 1 && !g[0].name) ? g.length + " Generationen" : "", false); }).join("");
+        items = brand.models.map(function (m) { var g = gensOf(brand, m); return mcard(base + "/" + m.id, m.name, g && g.length > 1 ? g.length + " Generationen" : "", false); }).join("");
       } else if (!gens) {
         title = brand.name + " " + model.name; count = "";
         lead = "Für dieses Modell nenne ich dir die Werte persönlich. Unten siehst du die typischen Stage-1-Richtwerte. Wähle ein anderes Modell oder frag mich direkt.";
@@ -344,15 +349,21 @@
         title = brand.name + " " + model.name; count = gens.length + " Generationen";
         lead = "Wähle die Generation deines " + model.name + ".";
         backHref = base; backText = "← " + brand.name;
-        items = gens.map(function (g) { return mcard(mBase + "/" + g.id, model.name + (g.name ? " – " + g.name : ""), g.jahre || "", false); }).join("");
+        items = gens.map(function (g) { return mcard(mBase + "/" + g.id, gtitle(model, g), g.jahre || "", false); }).join("");
+      } else if (!gen.motoren.length) {
+        title = brand.name + " " + gfull(model, gen); count = "";
+        lead = "Für diese Generation nenne ich dir die Werte persönlich. Unten siehst du die typischen Stage-1-Richtwerte. Wähle eine andere Generation oder frag mich direkt.";
+        backHref = mBase; backText = "← " + model.name + " Generationen";
+        items = gens.map(function (g) { return mcard(mBase + "/" + g.id, gtitle(model, g), g.jahre || "", g.id === gen.id); }).join("");
+        renderEmpty(title); power.setAttribute("data-title", title);
       } else if (!eng) {
-        title = brand.name + " " + model.name + gname(gen); count = gen.motoren.length + " Motoren";
+        title = brand.name + " " + gfull(model, gen); count = gen.motoren.length + " Motoren";
         lead = "Wähle deinen Motor. Du siehst gleich, wie viel Leistung und Drehmoment mit Stage 1 möglich sind.";
         backHref = single ? base : mBase; backText = single ? "← " + brand.name : "← " + model.name + " Generationen";
         cls = "cards cards--engines";
         items = gen.motoren.map(function (e) { return ecard(gBase + "/" + e.id, e); }).join("");
       } else {
-        title = brand.name + " " + model.name + gname(gen) + " " + eng.name; count = "";
+        title = brand.name + " " + gfull(model, gen) + " " + eng.name; count = "";
         lead = "";
         backHref = gBase; backText = "← Alle Motoren" + (gen.name ? " " + gen.name : "");
         stage = firstStage(eng) || 1;
@@ -367,7 +378,7 @@
       fMarke.value = brand.name;
       fModell.innerHTML = '<option value="">Modell wählen</option>' + brand.models.map(function (m) { return '<option value="' + esc(m.name) + '">' + esc(m.name) + "</option>"; }).join("") + '<option value="Anderes Modell">Anderes Modell</option>';
       fModell.value = model ? model.name : "";
-      if (fMotor) fMotor.value = eng ? ((gen.name ? gen.name + " " : "") + eng.name).trim() : "";
+      if (fMotor) fMotor.value = eng ? ((gen.name ? gen.name + " " : "") + eng.name).trim() : (gen && gen.name ? gen.name : "");
       if (fStufe) fStufe.value = eng ? "Stage " + stage : "Bitte beraten";
       document.title = (eng ? title : "Leistungssteigerung " + (model ? brand.name + " " + model.name : brand.name)) + " – CARDENO";
       renderSidebar(brand, model, gen);
