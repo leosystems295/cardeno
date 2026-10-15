@@ -779,3 +779,69 @@ p { margin: 0 0 1em; }
   .closer__btns .btn:first-child { background: #fff; color: #0a2a73; }
   .closer__btns .btn:first-child:hover { background: #fff; box-shadow: 0 0 0 5px rgba(255,255,255,.28); }
 }
+
+/* ==========================================================================
+   Leistungsübersicht beim Modell: Serie gegen Stage 1 / 2 / 3
+   ========================================================================== */
+.power { margin: 0 0 56px; padding: clamp(22px, 3.4vw, 40px); background: linear-gradient(170deg, var(--panel-2), var(--panel)); border: 1px solid var(--line-strong); border-radius: var(--r-card); scroll-margin-top: calc(var(--header-h) + 20px); box-shadow: 0 30px 80px -40px rgba(47,123,255,.4); }
+.power[hidden] { display: none; }
+.power__head h3 { font-size: clamp(1.6rem, 3vw, 2.3rem); letter-spacing: -0.03em; margin: 0 0 14px; }
+.power__badge { display: inline-block; margin: 0 0 16px; padding: 5px 12px; border: 1px dashed #f0b44c; border-radius: 999px; color: #f6c76b; font-size: .85rem; font-weight: 600; }
+.power__motor { margin: 0 0 14px; color: var(--muted); }
+.power__variants { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.power__variants button, .power__tabs button { cursor: pointer; font: inherit; font-weight: 600; color: #dce4f2; background: transparent; border: 1px solid var(--line-strong); border-radius: 999px; padding: 8px 16px; transition: border-color .15s ease, background .15s ease, color .15s ease; }
+.power__variants button:hover, .power__tabs button:hover:not(:disabled) { border-color: var(--blue); color: #fff; }
+.power__variants button[aria-pressed="true"] { background: rgba(47,123,255,.18); border-color: var(--blue); color: #fff; }
+.power__tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0 20px; }
+.power__tabs button { border-radius: 10px; padding: 13px 10px; text-align: center; }
+.power__tabs button[aria-pressed="true"] { background: var(--blue-strong); border-color: var(--blue); color: #fff; box-shadow: 0 0 0 4px rgba(47,123,255,.2); }
+.power__tabs button:disabled { opacity: .4; cursor: not-allowed; }
+.power__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 26px; }
+.power__stats div { padding: 16px 14px; background: rgba(4,6,10,.45); border: 1px solid var(--line); border-radius: 12px; text-align: center; }
+.power__stats strong { display: block; font-size: clamp(1.5rem, 3.4vw, 2.5rem); line-height: 1.05; letter-spacing: -0.03em; color: var(--blue-soft); }
+.power__stats span { display: block; margin-top: 6px; color: var(--muted); font-size: .9rem; }
+.power__bars { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 36px; margin-bottom: 26px; }
+.power__bar h4 { margin: 0 0 10px; font-size: 1rem; color: #fff; }
+.pb { display: grid; grid-template-columns: 4.6rem minmax(0, 1fr) 5.2rem; align-items: center; gap: 10px; margin-bottom: 8px; font-size: .92rem; }
+.pb span { color: var(--muted); }
+.pb em { font-style: normal; font-weight: 700; text-align: right; color: #dce4f2; }
+.pb i { display: block; height: 12px; background: rgba(125,177,255,.1); border-radius: 6px; overflow: hidden; }
+.pb b { display: block; height: 100%; background: #4a5a78; border-radius: 6px; animation: pbgrow .7s ease both; }
+.pb--on b { background: linear-gradient(90deg, var(--blue-strong), var(--blue)); box-shadow: 0 0 14px rgba(47,123,255,.6); }
+.pb--on em { color: #fff; }
+@keyframes pbgrow { from { width: 0 !important; } }
+.power__table { overflow-x: auto; margin-bottom: 18px; }
+.power__table table { width: 100%; border-collapse: collapse; min-width: 420px; }
+.power__table th, .power__table td { padding: 12px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.power__table thead th { color: var(--muted); font-size: .85rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.power__table th:first-child, .power__table td:first-child { text-align: left; }
+.power__table tbody th { font-weight: 600; color: #fff; }
+.power__table .on { color: #fff; background: rgba(47,123,255,.12); font-weight: 700; }
+.power__table small { display: block; color: var(--blue-soft); font-weight: 600; }
+.power__note { margin: 0 0 22px; color: var(--muted); font-size: .92rem; max-width: 70ch; }
+.power__empty { margin: 0 0 22px; color: #c3cde0; max-width: 62ch; }
+.power__foot .btn { width: auto; }
+@media (max-width: 760px) {
+  .power__bars { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .power { margin-bottom: 36px; padding: 20px 16px; }
+  .power__tabs { gap: 8px; margin: 14px 0 16px; }
+  .power__stats { gap: 8px; margin-bottom: 20px; }
+  .power__stats div { padding: 12px 6px; }
+  .power__stats span { font-size: .78rem; }
+  .pb { grid-template-columns: 3.6rem minmax(0, 1fr) 4.6rem; gap: 8px; font-size: .88rem; }
+  .power__table table { min-width: 0; font-size: .9rem; }
+  .power__table th, .power__table td { padding: 10px 5px; }
+  .power__foot .btn { width: 100%; justify-content: center; }
+}
+
+.tuning-layout > div { min-width: 0; }
+.power { min-width: 0; }
+@media (max-width: 640px) {
+  .power__table th, .power__table td { padding: 10px 4px; font-size: .9rem; }
+  .power__table tbody th { white-space: normal; line-height: 1.25; }
+  .power__table thead th { font-size: .72rem; letter-spacing: .03em; }
+  .power__table small { font-size: .78rem; }
+}
+@media (max-width: 640px) { .power__stats strong { font-size: 1.3rem; white-space: nowrap; } }
