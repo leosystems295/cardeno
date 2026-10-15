@@ -146,38 +146,23 @@
     });
   }
 
-  /* ---------- Leistungssteigerung: Marken & Modelle ---------- */
+  /* ---------- Leistungssteigerung: Marke → Modell → Generation → Motor → Leistungsübersicht ---------- */
   var overview = $("#marken-uebersicht");
   var view = $("#marken-detail");
   if (overview && view && BRANDS.length) {
     var grid = $("#marken-grid"), sidebar = $("#marken-liste"), search = $("#marken-suche"), emptyMsg = $("#marken-leer");
+    var cards = $("#karten"), power = $("#leistung"), back = $("#detail-back"), dTitle = $("#detail-titel"), dCount = $("#detail-count"), dLead = $("#detail-lead");
+    var fMarke = $("#f-marke"), fModell = $("#f-modell"), fMotor = $("#f-motor"), fStufe = $("#f-stufe");
     var baseTitle = document.title;
+    var POWER = window.CARDENO_POWER || {};
+    var STAGES = (CFG.leistungStufen && CFG.leistungStufen.length) ? CFG.leistungStufen.slice().sort() : [1];
+    var HINT = CFG.leistungHinweis || "Richtwerte. Die genauen Werte hängen von Motor, Baujahr, Zustand und Fahrzeug ab. Vor dem Auftrag sage ich dir ehrlich, was bei deinem Fahrzeug möglich ist.";
+    var stage = 1;
+    var CAR = '<svg viewBox="0 0 120 50" aria-hidden="true" focusable="false"><path d="M7 36c0-4 2-6 6-7l16-4 13-11c2-2 5-3 8-3h26c4 0 7 1 10 4l9 9 14 3c4 1 6 3 6 8v5h-9a9 9 0 0 0-18 0H42a9 9 0 0 0-18 0H7z"/><path d="M45 15h22l-1 10H38zM72 15h4l9 10H73z"/><circle cx="33" cy="41" r="6"/><circle cx="94" cy="41" r="6"/></svg>';
 
     grid.innerHTML = BRANDS.map(function (b) {
       return '<li><a class="brand-tile" href="#' + b.id + '" data-initial="' + esc(b.name.charAt(0)) + '" data-name="' + esc(b.name.toLowerCase()) + '"><strong>' + esc(b.name) + "</strong><span>" + b.models.length + " Modelle</span></a></li>";
     }).join("");
-    /* Seitenliste: Marken, beim geöffneten Hersteller darunter alle Modelle (wie bei hmperformance.ch) */
-    function renderSidebar(brand, modelName) {
-      sidebar.innerHTML = BRANDS.map(function (b) {
-        var open = !!brand && b.id === brand.id;
-        var html = "<li" + (open ? ' class="is-open"' : "") + '><a href="#' + b.id + '" data-brand="' + b.id + '"' + (open ? ' aria-expanded="true"' : "") + (open && !modelName ? ' aria-current="true"' : "") + ">" + esc(b.name) + "</a>";
-        if (open) {
-          html += '<ul class="brand-nav__models">' + b.models.map(function (mo) {
-            return '<li><a href="#' + b.id + "/" + mo.id + '" data-model="' + esc(mo.name) + '"' + (mo.name === modelName ? ' aria-current="true"' : "") + ">" + esc(mo.name) + "</a></li>";
-          }).join("") + "</ul>";
-        }
-        return html + "</li>";
-      }).join("");
-      var cur = $('a[aria-current="true"]', sidebar), bA = $("li.is-open > a", sidebar);
-      if (bA) {
-        var base = sidebar.getBoundingClientRect().top;
-        var toBrand = bA.getBoundingClientRect().top - base - 6;
-        var toCur = cur ? cur.getBoundingClientRect().top - base : 0;
-        // Marke oben zeigen. Liegt das gewählte Modell weiter unten, so scrollen, dass es sichtbar bleibt.
-        sidebar.scrollTop += (cur && toCur - toBrand > sidebar.clientHeight - 70) ? toCur - sidebar.clientHeight / 2 : toBrand;
-      }
-    }
-    renderSidebar(null, "");
 
     if (search) search.addEventListener("input", function () {
       var q = search.value.trim().toLowerCase(), n = 0;
@@ -188,157 +173,209 @@
       emptyMsg.hidden = n > 0;
     });
 
-    var form = $("#marken-formular");
-    var fMarke = $("#f-marke"), fModell = $("#f-modell"), modelList = $("#modell-liste");
-
-    /* ---------- Leistungsübersicht (Serie / Stage 1–3) ---------- */
-    var power = $("#leistung");
-    var POWER = window.CARDENO_POWER || {};
-    var pw = { brand: null, model: null, rows: [], vi: 0, stage: 1 };
-    var HINT = CFG.leistungHinweis || "Richtwerte. Die genauen Werte hängen von Motor, Baujahr, Zustand und Fahrzeug ab. Vor dem Auftrag sage ich dir ehrlich, was bei deinem Fahrzeug möglich ist.";
-
+    /* ----- Daten ----- */
+    function gensOf(brand, model) {
+      var d = POWER[brand.id + "/" + model.id];
+      if (!d) return null;
+      var list = Array.isArray(d) ? [{ id: "alle", name: "", motoren: d }] : (d.generationen || []);
+      list = list.filter(function (g) { return g.motoren && g.motoren.length; });
+      list.forEach(function (g) {
+        g.id = g.id || slug(g.name);
+        g.motoren.forEach(function (e) { e.id = e.id || slug(e.name); });
+      });
+      return list.length ? list : null;
+    }
+    function kw(ps) { return Math.round(ps * 0.7355); }
     function pct(a, b) { return Math.round((b - a) / a * 100); }
     function sign(n) { return (n > 0 ? "+" : n < 0 ? "−" : "±") + Math.abs(n); }
-    var STAGES = (CFG.leistungStufen && CFG.leistungStufen.length) ? CFG.leistungStufen.slice().sort() : [1];
-    function stageOf(v, k) { return STAGES.indexOf(k) >= 0 ? (v["s" + k] || null) : null; }
-    function firstStage(v) { for (var i = 0; i < STAGES.length; i++) if (stageOf(v, STAGES[i])) return STAGES[i]; return 0; }
+    function stageOf(e, k) { return STAGES.indexOf(k) >= 0 ? (e["s" + k] || null) : null; }
+    function firstStage(e) { for (var i = 0; i < STAGES.length; i++) if (stageOf(e, STAGES[i])) return STAGES[i]; return 0; }
 
-    function renderPower() {
-      if (!power) return;
-      if (!pw.model) { power.hidden = true; power.innerHTML = ""; return; }
-      var title = pw.brand.name + " " + pw.model.name;
-      var h = '<div class="power__head"><p class="kicker">Leistungsübersicht</p><h3 id="leistung-titel">' + esc(title) + "</h3></div>";
-      var cta = '<button class="btn" type="button" data-power-cta><span>Anfrage für ' + esc(title) + "</span></button>";
-      if (!pw.rows.length) {
-        var typ = [
-          ["Turbo-Diesel", "+18 bis +25 %", "+20 bis +30 %"],
-          ["Turbo-Benziner", "+15 bis +25 %", "+15 bis +25 %"],
-          ["Saug-Benziner", "+3 bis +7 %", "+3 bis +6 %"]
-        ];
-        power.innerHTML = h + '<p class="power__motor">Stage 1 · typische Werte nach Motorart</p>' +
-          '<div class="power__typ">' + typ.map(function (r) {
-            return '<div><h4>' + r[0] + '</h4><p><strong>' + r[1] + '</strong><span>Leistung</span></p><p><strong>' + r[2] + '</strong><span>Drehmoment</span></p></div>';
-          }).join("") + "</div>" +
-          '<p class="power__note">Richtwerte für Stage 1. Wie viel es bei deinem ' + esc(title) + ' genau ist, hängt von Motor, Baujahr und Zustand ab. Schick mir die Angaben zu deinem Fahrzeug, ich nenne dir die genauen Werte und sage dir ehrlich, was möglich ist.</p><div class="power__foot">' + cta + "</div>";
-        power.hidden = false; return;
+    /* ----- Seitenliste: Marken, darunter Modelle, darunter Generationen (wie bei hmperformance.ch) ----- */
+    function renderSidebar(brand, model, gen) {
+      sidebar.innerHTML = BRANDS.map(function (b) {
+        var open = !!brand && b.id === brand.id;
+        var html = "<li" + (open ? ' class="is-open"' : "") + '><a href="#' + b.id + '"' + (open ? ' aria-expanded="true"' : "") + (open && !model ? ' aria-current="true"' : "") + ">" + esc(b.name) + "</a>";
+        if (open) {
+          html += '<ul class="brand-nav__models">' + b.models.map(function (mo) {
+            var isM = !!model && mo.id === model.id, gl = isM ? gensOf(b, mo) : null;
+            var s = '<li><a href="#' + b.id + "/" + mo.id + '"' + (isM && !gen ? ' aria-current="true"' : "") + ">" + esc(mo.name) + "</a>";
+            if (gl && !(gl.length === 1 && !gl[0].name)) {
+              s += '<ul class="brand-nav__gens">' + gl.map(function (g) {
+                return '<li><a href="#' + b.id + "/" + mo.id + "/" + g.id + '"' + (gen && g.id === gen.id ? ' aria-current="true"' : "") + ">" + esc(mo.name + " – " + g.name) + "</a></li>";
+              }).join("") + "</ul>";
+            }
+            return s + "</li>";
+          }).join("") + "</ul>";
+        }
+        return html + "</li>";
+      }).join("");
+      var cur = $('a[aria-current="true"]', sidebar), bA = $("li.is-open > a", sidebar);
+      if (bA) {
+        var base = sidebar.getBoundingClientRect().top;
+        var toBrand = bA.getBoundingClientRect().top - base - 6;
+        var toCur = cur ? cur.getBoundingClientRect().top - base : 0;
+        sidebar.scrollTop += (cur && toCur - toBrand > sidebar.clientHeight - 70) ? toCur - sidebar.clientHeight / 2 : toBrand;
       }
-      var v = pw.rows[pw.vi] || pw.rows[0];
-      if (!stageOf(v, pw.stage)) pw.stage = firstStage(v) || 1;
-      var t = stageOf(v, pw.stage), s = v.serie;
+    }
+    renderSidebar(null, null, null);
 
-      var variants = "";
-      if (pw.rows.length > 1) {
-        variants = '<div class="power__variants" role="group" aria-label="Motorisierung wählen">' + pw.rows.map(function (r, i) {
-          return '<button type="button" data-vi="' + i + '" aria-pressed="' + (i === pw.vi) + '">' + esc(r.motor) + "</button>";
-        }).join("") + "</div>";
-      } else {
-        variants = '<p class="power__motor">' + esc(v.motor) + (v.jahre ? " · " + esc(v.jahre) : "") + "</p>";
-      }
-      var sub = pw.rows.length > 1 && v.jahre ? '<p class="power__motor">Baujahre ' + esc(v.jahre) + "</p>" : "";
-      var badge = v.beispiel ? '<p class="power__badge">Beispielwerte, nicht verbindlich</p>' : "";
+    /* ----- Karten ----- */
+    function mcard(href, title, sub, current) {
+      return '<li><a class="mcard" href="' + href + '"' + (current ? ' aria-current="true"' : "") + '><span class="mcard__img">' + CAR + "</span><strong>" + esc(title) + "</strong>" + (sub ? "<span>" + esc(sub) + "</span>" : "") + "</a></li>";
+    }
+    function ecard(href, e) {
+      var s = e.serie;
+      return '<li class="ecard"><h3>' + esc(e.name) + '</h3><p class="ecard__ps">' + s.ps + " PS / " + (s.kw || kw(s.ps)) + " kW</p>" +
+        (e.art ? "<p>Motorart: " + esc(e.art) + "</p>" : "") + (e.hubraum ? "<p>Hubraum: " + esc(e.hubraum) + " ccm</p>" : "") + (e.jahre ? "<p>Baujahre: " + esc(e.jahre) + "</p>" : "") +
+        '<a class="btn" href="' + href + '"><span>Auswählen</span></a></li>';
+    }
 
+    /* ----- Leistungsübersicht ----- */
+    function renderEmpty(title) {
+      var typ = [
+        ["Turbo-Diesel", "+18 bis +25 %", "+20 bis +30 %"],
+        ["Turbo-Benziner", "+15 bis +25 %", "+15 bis +25 %"],
+        ["Saug-Benziner", "+3 bis +7 %", "+3 bis +6 %"]
+      ];
+      power.innerHTML = '<div class="power__head"><p class="kicker">Leistungsübersicht</p><h3 id="leistung-titel">' + esc(title) + "</h3></div>" +
+        '<p class="power__motor">Stage 1 · typische Werte nach Motorart</p><div class="power__typ">' + typ.map(function (r) {
+          return "<div><h4>" + r[0] + "</h4><p><strong>" + r[1] + "</strong><span>Leistung</span></p><p><strong>" + r[2] + "</strong><span>Drehmoment</span></p></div>";
+        }).join("") + "</div>" +
+        '<p class="power__note">Richtwerte für Stage 1. Wie viel es bei deinem ' + esc(title) + ' genau ist, hängt von Motor, Baujahr und Zustand ab. Schick mir die Angaben zu deinem Fahrzeug, ich nenne dir die genauen Werte und sage dir ehrlich, was möglich ist.</p>' +
+        '<div class="power__foot"><button class="btn" type="button" data-power-cta><span>Anfrage für ' + esc(title) + "</span></button></div>";
+      power.hidden = false;
+    }
+
+    function renderEngine(title, e) {
+      if (!stageOf(e, stage)) stage = firstStage(e) || 1;
+      var t = stageOf(e, stage), s = e.serie;
       var tabs = STAGES.length < 2 ? "" : '<div class="power__tabs" role="group" aria-label="Stufe wählen">' + STAGES.map(function (k) {
-        var has = !!stageOf(v, k);
-        return '<button type="button" data-stage="' + k + '" aria-pressed="' + (k === pw.stage) + '"' + (has ? "" : " disabled") + ">Stage " + k + "</button>";
+        return '<button type="button" data-stage="' + k + '" aria-pressed="' + (k === stage) + '"' + (stageOf(e, k) ? "" : " disabled") + ">Stage " + k + "</button>";
       }).join("") + "</div>";
-
-      var stats = '<div class="power__stats">' +
-        '<div><strong>' + sign(t.ps - s.ps) + ' PS</strong><span>mehr Leistung</span></div>' +
-        '<div><strong>' + sign(t.nm - s.nm) + ' Nm</strong><span>mehr Drehmoment</span></div>' +
-        '<div><strong>' + sign(pct(s.ps, t.ps)) + ' %</strong><span>Leistung</span></div></div>';
-
+      var stats = '<div class="power__stats"><div><strong>' + sign(t.ps - s.ps) + " PS</strong><span>mehr Leistung</span></div>" +
+        "<div><strong>" + sign(t.nm - s.nm) + " Nm</strong><span>mehr Drehmoment</span></div>" +
+        "<div><strong>" + sign(pct(s.ps, t.ps)) + " %</strong><span>Leistung</span></div></div>";
       function maxOf(key) {
-        var m = v.serie[key];
-        for (var i = 0; i < STAGES.length; i++) { var x = stageOf(v, STAGES[i]); if (x && x[key] > m) m = x[key]; }
+        var m = s[key];
+        for (var i = 0; i < STAGES.length; i++) { var x = stageOf(e, STAGES[i]); if (x && x[key] > m) m = x[key]; }
         return m;
       }
       function bars(label, key, unit) {
         var max = maxOf(key);
         return '<div class="power__bar"><h4>' + label + "</h4>" +
           '<div class="pb"><span>Serie</span><i><b style="width:' + (s[key] / max * 100).toFixed(1) + '%"></b></i><em>' + s[key] + " " + unit + "</em></div>" +
-          '<div class="pb pb--on"><span>Stage ' + pw.stage + '</span><i><b style="width:' + (t[key] / max * 100).toFixed(1) + '%"></b></i><em>' + t[key] + " " + unit + "</em></div></div>";
+          '<div class="pb pb--on"><span>Stage ' + stage + '</span><i><b style="width:' + (t[key] / max * 100).toFixed(1) + '%"></b></i><em>' + t[key] + " " + unit + "</em></div></div>";
       }
-
-      var head = "<tr><th scope=\"col\"><span class=\"visually-hidden\">Wert</span></th><th scope=\"col\">Serie</th>" + STAGES.map(function (k) { return '<th scope="col"' + (k === pw.stage ? ' class="on"' : "") + ">Stage " + k + "</th>"; }).join("") + "</tr>";
-      function row(label, key, unit) {
-        return "<tr><th scope=\"row\">" + label + "</th><td>" + s[key] + "</td>" + STAGES.map(function (k) {
-          var x = stageOf(v, k);
-          return "<td" + (k === pw.stage ? ' class="on"' : "") + ">" + (x ? x[key] + (key === "ps" ? ' <small>' + sign(pct(s.ps, x.ps)) + " %</small>" : "") : "–") + "</td>";
-        }).join("") + "</tr>";
-      }
-      var table = '<div class="power__table"><table><caption class="visually-hidden">Leistung und Drehmoment: Serie gegen Tuning, ein Strich bedeutet: Stufe auf Anfrage</caption><thead>' + head + "</thead><tbody>" + row("Leistung (PS)", "ps", "PS") + row("Drehmoment (Nm)", "nm", "Nm") + "</tbody></table></div>";
-
-      power.innerHTML = h + badge + variants + sub + tabs + stats + '<div class="power__bars">' + bars("Leistung", "ps", "PS") + bars("Drehmoment", "nm", "Nm") + "</div>" + table +
-        '<p class="power__note">' + esc(HINT) + '</p><div class="power__foot">' + cta + "</div>";
+      var rows = [["Leistung (kW)", function (o) { return o.kw || kw(o.ps); }, true], ["Leistung (PS)", function (o) { return o.ps; }, true], ["Drehmoment (Nm)", function (o) { return o.nm; }, true]];
+      if (s.vmax && t.vmax) rows.push(["Höchstgeschw. (km/h)", function (o) { return o.vmax; }, false]);
+      var table = '<div class="power__table"><table><caption class="visually-hidden">Serie gegen Tuning</caption><thead><tr><th scope="col"><span class="visually-hidden">Wert</span></th><th scope="col">Serie</th>' +
+        STAGES.map(function (k) { return '<th scope="col"' + (k === stage ? ' class="on"' : "") + ">Stage " + k + "</th>"; }).join("") + "</tr></thead><tbody>" +
+        rows.map(function (r) {
+          var base = r[1](s);
+          return '<tr><th scope="row">' + r[0] + "</th><td>" + base + "</td>" + STAGES.map(function (k) {
+            var x = stageOf(e, k);
+            return "<td" + (k === stage ? ' class="on"' : "") + ">" + (x ? r[1](x) + (r[2] ? " <small>ca. " + sign(pct(base, r[1](x))) + " %</small>" : "") : "–") + "</td>";
+          }).join("") + "</tr>";
+        }).join("") + "</tbody></table></div>";
+      var meta = [e.art, e.hubraum ? e.hubraum + " ccm" : "", e.jahre ? "Baujahre " + e.jahre : ""].filter(Boolean).join(" · ");
+      power.innerHTML = '<div class="power__head"><p class="kicker">Leistungsübersicht</p><h3 id="leistung-titel">' + esc(title) + "</h3></div>" +
+        (e.beispiel ? '<p class="power__badge">Beispielwerte, nicht verbindlich</p>' : "") + (meta ? '<p class="power__motor">' + esc(meta) + "</p>" : "") +
+        tabs + stats + '<div class="power__bars">' + bars("Leistung", "ps", "PS") + bars("Drehmoment", "nm", "Nm") + "</div>" + table +
+        '<p class="power__note">' + esc(HINT) + '</p><div class="power__foot"><button class="btn" type="button" data-power-cta><span>Anfrage für ' + esc(title) + "</span></button></div>";
       power.hidden = false;
     }
 
-    if (power) {
-      power.addEventListener("click", function (e) {
-        var b = e.target.closest("button"); if (!b) return;
-        if (b.hasAttribute("data-power-cta")) { $("#anfrage").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-        if (b.hasAttribute("data-vi")) {
-          pw.vi = +b.getAttribute("data-vi");
-          var mo = $("#f-motor"); if (mo && pw.rows[pw.vi]) mo.value = pw.rows[pw.vi].motor;
-          renderPower(); return;
-        }
-        if (b.hasAttribute("data-stage")) {
-          pw.stage = +b.getAttribute("data-stage");
-          var sel = $("#f-stufe"); if (sel) sel.value = "Stage " + pw.stage;
-          renderPower();
-        }
-      });
-    }
-
-    function showPower(brand, name) {
-      var model = brand && name ? brand.models.filter(function (m) { return m.name === name; })[0] : null;
-      pw.brand = brand; pw.model = model || null; pw.vi = 0; pw.stage = 1;
-      pw.rows = model ? (POWER[brand.id + "/" + model.id] || []) : [];
-      if (pw.rows.length) pw.stage = firstStage(pw.rows[0]) || 1;
-      renderPower();
-    }
-    var curBrand = null;
-
-    function selectModel(name, scroll) {
-      fModell.value = name || "";
-      $$("button", modelList).forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-name") === name)); });
-      showPower(curBrand, name);
-      renderSidebar(curBrand, name);
-      var target = (power && !power.hidden) ? power : $("#anfrage");
-      if (scroll) {
-        var mo = curBrand && curBrand.models.filter(function (x) { return x.name === name; })[0];
-        if (mo && history.replaceState) history.replaceState(null, "", "#" + curBrand.id + "/" + mo.id);
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
+    var cur = { brand: null, model: null, gen: null, eng: null };
+    if (power) power.addEventListener("click", function (ev) {
+      var b = ev.target.closest("button"); if (!b) return;
+      if (b.hasAttribute("data-power-cta")) { $("#anfrage").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+      if (b.hasAttribute("data-stage") && cur.eng) {
+        stage = +b.getAttribute("data-stage");
+        if (fStufe) fStufe.value = "Stage " + stage;
+        renderEngine(power.getAttribute("data-title"), cur.eng);
       }
-    }
-    fModell.addEventListener("change", function () {
-      $$("button", modelList).forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-name") === fModell.value)); });
-      showPower(curBrand, fModell.value);
-      renderSidebar(curBrand, fModell.value);
+    });
+    if (fModell) fModell.addEventListener("change", function () {
+      if (!cur.brand) return;
+      var m = cur.brand.models.filter(function (x) { return x.name === fModell.value; })[0];
+      if (m) location.hash = "#" + cur.brand.id + "/" + m.id;
     });
 
+    /* ----- Seite aufbauen ----- */
+    var firstRender = true;
     function route() {
       var parts = decodeURIComponent(location.hash.replace(/^#\/?/, "")).split("/");
       var brand = find(parts[0]);
       if (!brand) {
         view.hidden = true; overview.hidden = false; document.title = baseTitle;
-        renderSidebar(null, "");
+        renderSidebar(null, null, null); cur = { brand: null, model: null, gen: null, eng: null };
         return;
       }
+      var model = parts[1] ? brand.models.filter(function (m) { return m.id === parts[1]; })[0] : null;
+      var gens = model ? gensOf(brand, model) : null;
+      var gen = null, eng = null;
+      if (gens) {
+        gen = parts[2] ? gens.filter(function (g) { return g.id === parts[2]; })[0] || null : null;
+        if (!gen && gens.length === 1) gen = gens[0];
+        eng = gen && parts[3] ? gen.motoren.filter(function (e) { return e.id === parts[3]; })[0] || null : null;
+      }
+      cur = { brand: brand, model: model, gen: gen, eng: eng };
       overview.hidden = true; view.hidden = false;
-      curBrand = brand; showPower(brand, "");
-      $("#detail-name").textContent = brand.name;
-      $("#detail-count").textContent = brand.models.length + " Modelle";
+
+      var base = "#" + brand.id, mBase = model ? base + "/" + model.id : "", gBase = gen ? mBase + "/" + gen.id : "";
+      var single = gens && gens.length === 1;
+      var gname = function (g) { return g && g.name ? " " + g.name : ""; };
+      var title, lead, count, backHref, backText, items = "", cls = "cards";
+      power.hidden = true; power.innerHTML = "";
+
+      if (!model) {
+        title = "Leistungssteigerung " + brand.name; count = brand.models.length + " Modelle";
+        lead = "Wähle dein Modell aus. Dein Modell steht nicht in der Liste? Wähle «Anderes Modell» im Formular, ich prüfe es gerne.";
+        backHref = "#"; backText = "← Alle Marken";
+        items = brand.models.map(function (m) { var g = gensOf(brand, m); return mcard(base + "/" + m.id, m.name, g && !(g.length === 1 && !g[0].name) ? g.length + " Generationen" : "", false); }).join("");
+      } else if (!gens) {
+        title = brand.name + " " + model.name; count = "";
+        lead = "Für dieses Modell nenne ich dir die Werte persönlich. Unten siehst du die typischen Stage-1-Richtwerte. Wähle ein anderes Modell oder frag mich direkt.";
+        backHref = base; backText = "← " + brand.name;
+        items = brand.models.map(function (m) { return mcard(base + "/" + m.id, m.name, "", m.id === model.id); }).join("");
+        renderEmpty(brand.name + " " + model.name); power.setAttribute("data-title", brand.name + " " + model.name);
+      } else if (!gen) {
+        title = brand.name + " " + model.name; count = gens.length + " Generationen";
+        lead = "Wähle die Generation deines " + model.name + ".";
+        backHref = base; backText = "← " + brand.name;
+        items = gens.map(function (g) { return mcard(mBase + "/" + g.id, model.name + (g.name ? " – " + g.name : ""), g.jahre || "", false); }).join("");
+      } else if (!eng) {
+        title = brand.name + " " + model.name + gname(gen); count = gen.motoren.length + " Motoren";
+        lead = "Wähle deinen Motor. Du siehst gleich, wie viel Leistung und Drehmoment mit Stage 1 möglich sind.";
+        backHref = single ? base : mBase; backText = single ? "← " + brand.name : "← " + model.name + " Generationen";
+        cls = "cards cards--engines";
+        items = gen.motoren.map(function (e) { return ecard(gBase + "/" + e.id, e); }).join("");
+      } else {
+        title = brand.name + " " + model.name + gname(gen) + " " + eng.name; count = "";
+        lead = "";
+        backHref = gBase; backText = "← Alle Motoren" + (gen.name ? " " + gen.name : "");
+        stage = firstStage(eng) || 1;
+        power.setAttribute("data-title", title);
+        renderEngine(title, eng);
+      }
+      back.setAttribute("href", backHref); back.textContent = backText;
+      dTitle.textContent = title; dCount.textContent = count; dLead.textContent = lead; dLead.hidden = !lead;
+      cards.className = cls; cards.innerHTML = items; cards.hidden = !items;
+
       $("#detail-brand-text").textContent = brand.name;
       fMarke.value = brand.name;
-      modelList.innerHTML = brand.models.map(function (m) { return '<li><button type="button" data-name="' + esc(m.name) + '" aria-pressed="false">' + esc(m.name) + "</button></li>"; }).join("");
       fModell.innerHTML = '<option value="">Modell wählen</option>' + brand.models.map(function (m) { return '<option value="' + esc(m.name) + '">' + esc(m.name) + "</option>"; }).join("") + '<option value="Anderes Modell">Anderes Modell</option>';
-      $$("button", modelList).forEach(function (b) { b.addEventListener("click", function () { selectModel(b.getAttribute("data-name"), true); }); });
-      renderSidebar(brand, "");
-      document.title = "Leistungssteigerung " + brand.name + " – CARDENO";
-      var wanted = parts[1] ? brand.models.filter(function (m) { return m.id === parts[1]; })[0] : null;
-      if (wanted) { selectModel(wanted.name, false); setTimeout(function () { (power && !power.hidden ? power : $("#anfrage")).scrollIntoView({ block: "start" }); }, 60); }
+      fModell.value = model ? model.name : "";
+      if (fMotor) fMotor.value = eng ? ((gen.name ? gen.name + " " : "") + eng.name).trim() : "";
+      if (fStufe) fStufe.value = eng ? "Stage " + stage : "Bitte beraten";
+      document.title = (eng ? title : "Leistungssteigerung " + (model ? brand.name + " " + model.name : brand.name)) + " – CARDENO";
+      renderSidebar(brand, model, gen);
+
+      var top = $(".brand-view__top");
+      if (!firstRender || parts.length > 1) window.scrollTo({ top: Math.max(0, top.getBoundingClientRect().top + window.scrollY - 110), behavior: firstRender ? "auto" : "smooth" });
       else window.scrollTo(0, Math.min(window.scrollY, $(".tuning-section").offsetTop - 90));
+      firstRender = false;
     }
     window.addEventListener("hashchange", route);
     route();
