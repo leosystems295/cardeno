@@ -858,3 +858,9 @@ p { margin: 0 0 1em; }
   .power__typ > div { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; padding: 14px; }
   .power__typ h4 { grid-column: 1 / -1; margin-bottom: 4px; }
 }
+
+/* Seitenliste: Modelle unter der geöffneten Marke */
+.brand-nav li.is-open > a { color: #fff; font-weight: 700; }
+.brand-nav .brand-nav__models { max-height: none; overflow: visible; padding: 2px 0 10px; margin: 0; background: rgba(4,6,10,.35); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.brand-nav .brand-nav__models a { padding: 7px 24px 7px 42px; font-weight: 500; font-size: .93rem; color: #aeb9cf; }
+.brand-nav .brand-nav__models a[aria-current="true"] { color: #fff; font-weight: 700; }
