@@ -892,3 +892,15 @@ p { margin: 0 0 1em; }
   .mcard { padding: 12px 14px; min-height: 64px; }
   .mcard strong { font-size: .98rem; }
 }
+
+/* Bestätigung nach dem Senden */
+.thanks { position: fixed; inset: 0; z-index: 1050; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(2,4,8,.78); backdrop-filter: blur(6px); opacity: 0; transition: opacity .25s ease; }
+.thanks.is-in { opacity: 1; }
+.thanks__box { width: 100%; max-width: 440px; text-align: center; padding: 40px 28px 30px; background: var(--panel); border: 1px solid var(--line-strong); border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(47,123,255,.15); transform: translateY(14px) scale(.97); transition: transform .3s ease; outline: none; }
+.thanks.is-in .thanks__box { transform: none; }
+.thanks__icon { width: 68px; height: 68px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--blue); box-shadow: 0 0 0 8px rgba(47,123,255,.2); }
+.thanks h2 { margin: 0 0 10px; font-size: 1.6rem; color: var(--text); }
+.thanks p { margin: 0 0 26px; color: var(--muted); line-height: 1.55; }
+.thanks .btn { min-width: 160px; }
+body.thanks-open { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .thanks, .thanks__box { transition: none; } }
