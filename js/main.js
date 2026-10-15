@@ -286,7 +286,7 @@
         }).join("") + "</tbody></table></div>";
       var meta = [e.art, e.hubraum ? e.hubraum + " ccm" : "", e.jahre ? "Baujahre " + e.jahre : ""].filter(Boolean).join(" · ");
       power.innerHTML = '<div class="power__head"><p class="kicker">Leistungsübersicht</p><h3 id="leistung-titel">' + esc(title) + "</h3></div>" +
-        (e.beispiel ? '<p class="power__badge">Beispielwerte, nicht verbindlich</p>' : "") + (meta ? '<p class="power__motor">' + esc(meta) + "</p>" : "") +
+        (e.beispiel ? '<p class="power__badge">Richtwerte, nicht verbindlich</p>' : "") + (meta ? '<p class="power__motor">' + esc(meta) + "</p>" : "") +
         tabs + stats + '<div class="power__bars">' + bars("Leistung", "ps", "PS") + bars("Drehmoment", "nm", "Nm") + "</div>" + table +
         '<p class="power__note">' + esc(HINT) + '</p><div class="power__foot"><button class="btn" type="button" data-power-cta><span>Anfrage für ' + esc(title) + "</span></button></div>";
       power.hidden = false;
