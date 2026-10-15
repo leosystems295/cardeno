@@ -178,8 +178,9 @@
 
     function pct(a, b) { return Math.round((b - a) / a * 100); }
     function sign(n) { return (n > 0 ? "+" : n < 0 ? "−" : "±") + Math.abs(n); }
-    function stageOf(v, k) { return v["s" + k] || null; }
-    function firstStage(v) { for (var k = 1; k <= 3; k++) if (stageOf(v, k)) return k; return 0; }
+    var STAGES = (CFG.leistungStufen && CFG.leistungStufen.length) ? CFG.leistungStufen.slice().sort() : [1];
+    function stageOf(v, k) { return STAGES.indexOf(k) >= 0 ? (v["s" + k] || null) : null; }
+    function firstStage(v) { for (var i = 0; i < STAGES.length; i++) if (stageOf(v, STAGES[i])) return STAGES[i]; return 0; }
 
     function renderPower() {
       if (!power) return;
@@ -188,7 +189,16 @@
       var h = '<div class="power__head"><p class="kicker">Leistungsübersicht</p><h3 id="leistung-titel">' + esc(title) + "</h3></div>";
       var cta = '<button class="btn" type="button" data-power-cta><span>Anfrage für ' + esc(title) + "</span></button>";
       if (!pw.rows.length) {
-        power.innerHTML = h + '<p class="power__empty">Die genauen Werte für deinen ' + esc(title) + ' nenne ich dir persönlich. Sie hängen von Motor, Baujahr und Zustand ab. Schick mir kurz die Angaben zu deinem Fahrzeug, ich melde mich mit einer ehrlichen Einschätzung.</p><div class="power__foot">' + cta + "</div>";
+        var typ = [
+          ["Turbo-Diesel", "+18 bis +25 %", "+20 bis +30 %"],
+          ["Turbo-Benziner", "+15 bis +25 %", "+15 bis +25 %"],
+          ["Saug-Benziner", "+3 bis +7 %", "+3 bis +6 %"]
+        ];
+        power.innerHTML = h + '<p class="power__motor">Stage 1 · typische Werte nach Motorart</p>' +
+          '<div class="power__typ">' + typ.map(function (r) {
+            return '<div><h4>' + r[0] + '</h4><p><strong>' + r[1] + '</strong><span>Leistung</span></p><p><strong>' + r[2] + '</strong><span>Drehmoment</span></p></div>';
+          }).join("") + "</div>" +
+          '<p class="power__note">Richtwerte für Stage 1. Wie viel es bei deinem ' + esc(title) + ' genau ist, hängt von Motor, Baujahr und Zustand ab. Schick mir die Angaben zu deinem Fahrzeug, ich nenne dir die genauen Werte und sage dir ehrlich, was möglich ist.</p><div class="power__foot">' + cta + "</div>";
         power.hidden = false; return;
       }
       var v = pw.rows[pw.vi] || pw.rows[0];
@@ -206,7 +216,7 @@
       var sub = pw.rows.length > 1 && v.jahre ? '<p class="power__motor">Baujahre ' + esc(v.jahre) + "</p>" : "";
       var badge = v.beispiel ? '<p class="power__badge">Beispielwerte, nicht verbindlich</p>' : "";
 
-      var tabs = '<div class="power__tabs" role="group" aria-label="Stufe wählen">' + [1, 2, 3].map(function (k) {
+      var tabs = STAGES.length < 2 ? "" : '<div class="power__tabs" role="group" aria-label="Stufe wählen">' + STAGES.map(function (k) {
         var has = !!stageOf(v, k);
         return '<button type="button" data-stage="' + k + '" aria-pressed="' + (k === pw.stage) + '"' + (has ? "" : " disabled") + ">Stage " + k + "</button>";
       }).join("") + "</div>";
@@ -218,7 +228,7 @@
 
       function maxOf(key) {
         var m = v.serie[key];
-        for (var k = 1; k <= 3; k++) { var x = stageOf(v, k); if (x && x[key] > m) m = x[key]; }
+        for (var i = 0; i < STAGES.length; i++) { var x = stageOf(v, STAGES[i]); if (x && x[key] > m) m = x[key]; }
         return m;
       }
       function bars(label, key, unit) {
@@ -228,14 +238,14 @@
           '<div class="pb pb--on"><span>Stage ' + pw.stage + '</span><i><b style="width:' + (t[key] / max * 100).toFixed(1) + '%"></b></i><em>' + t[key] + " " + unit + "</em></div></div>";
       }
 
-      var head = "<tr><th scope=\"col\"><span class=\"visually-hidden\">Wert</span></th><th scope=\"col\">Serie</th>" + [1, 2, 3].map(function (k) { return '<th scope="col"' + (k === pw.stage ? ' class="on"' : "") + ">Stage " + k + "</th>"; }).join("") + "</tr>";
+      var head = "<tr><th scope=\"col\"><span class=\"visually-hidden\">Wert</span></th><th scope=\"col\">Serie</th>" + STAGES.map(function (k) { return '<th scope="col"' + (k === pw.stage ? ' class="on"' : "") + ">Stage " + k + "</th>"; }).join("") + "</tr>";
       function row(label, key, unit) {
-        return "<tr><th scope=\"row\">" + label + "</th><td>" + s[key] + "</td>" + [1, 2, 3].map(function (k) {
+        return "<tr><th scope=\"row\">" + label + "</th><td>" + s[key] + "</td>" + STAGES.map(function (k) {
           var x = stageOf(v, k);
           return "<td" + (k === pw.stage ? ' class="on"' : "") + ">" + (x ? x[key] + (key === "ps" ? ' <small>' + sign(pct(s.ps, x.ps)) + " %</small>" : "") : "–") + "</td>";
         }).join("") + "</tr>";
       }
-      var table = '<div class="power__table"><table><caption class="visually-hidden">Leistung und Drehmoment von Serie bis Stage 3, ein Strich bedeutet: Stufe auf Anfrage</caption><thead>' + head + "</thead><tbody>" + row("Leistung (PS)", "ps", "PS") + row("Drehmoment (Nm)", "nm", "Nm") + "</tbody></table></div>";
+      var table = '<div class="power__table"><table><caption class="visually-hidden">Leistung und Drehmoment: Serie gegen Tuning, ein Strich bedeutet: Stufe auf Anfrage</caption><thead>' + head + "</thead><tbody>" + row("Leistung (PS)", "ps", "PS") + row("Drehmoment (Nm)", "nm", "Nm") + "</tbody></table></div>";
 
       power.innerHTML = h + badge + variants + sub + tabs + stats + '<div class="power__bars">' + bars("Leistung", "ps", "PS") + bars("Drehmoment", "nm", "Nm") + "</div>" + table +
         '<p class="power__note">' + esc(HINT) + '</p><div class="power__foot">' + cta + "</div>";

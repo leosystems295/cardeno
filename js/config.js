@@ -45,6 +45,12 @@ window.CARDENO_CONFIG = {
   formEndpoint: "",
 
   /*
+    Leistungsübersicht: Welche Stufen angezeigt werden. [1] = nur Stage 1, [1, 2, 3] = alle drei.
+    Für Modelle ohne Eintrag in leistung-data.js erscheinen die Richtwerte für Stage 1.
+  */
+  leistungStufen: [1],
+
+  /*
     Statistik (optional): Komplette Script-URL des Statistik-Dienstes.
     Das Skript wird erst geladen, wenn Besucher im Cookie-Hinweis «Statistik» erlauben.
     Leer lassen = keine Statistik.
