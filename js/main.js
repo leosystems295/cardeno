@@ -170,11 +170,115 @@
     var form = $("#marken-formular");
     var fMarke = $("#f-marke"), fModell = $("#f-modell"), modelList = $("#modell-liste");
 
+    /* ---------- Leistungsübersicht (Serie / Stage 1–3) ---------- */
+    var power = $("#leistung");
+    var POWER = window.CARDENO_POWER || {};
+    var pw = { brand: null, model: null, rows: [], vi: 0, stage: 1 };
+    var HINT = CFG.leistungHinweis || "Richtwerte. Die genauen Werte hängen von Motor, Baujahr, Zustand und Fahrzeug ab. Vor dem Auftrag sage ich dir ehrlich, was bei deinem Fahrzeug möglich ist.";
+
+    function pct(a, b) { return Math.round((b - a) / a * 100); }
+    function sign(n) { return (n > 0 ? "+" : n < 0 ? "−" : "±") + Math.abs(n); }
+    function stageOf(v, k) { return v["s" + k] || null; }
+    function firstStage(v) { for (var k = 1; k <= 3; k++) if (stageOf(v, k)) return k; return 0; }
+
+    function renderPower() {
+      if (!power) return;
+      if (!pw.model) { power.hidden = true; power.innerHTML = ""; return; }
+      var title = pw.brand.name + " " + pw.model.name;
+      var h = '<div class="power__head"><p class="kicker">Leistungsübersicht</p><h3 id="leistung-titel">' + esc(title) + "</h3></div>";
+      var cta = '<button class="btn" type="button" data-power-cta><span>Anfrage für ' + esc(title) + "</span></button>";
+      if (!pw.rows.length) {
+        power.innerHTML = h + '<p class="power__empty">Die genauen Werte für deinen ' + esc(title) + ' nenne ich dir persönlich. Sie hängen von Motor, Baujahr und Zustand ab. Schick mir kurz die Angaben zu deinem Fahrzeug, ich melde mich mit einer ehrlichen Einschätzung.</p><div class="power__foot">' + cta + "</div>";
+        power.hidden = false; return;
+      }
+      var v = pw.rows[pw.vi] || pw.rows[0];
+      if (!stageOf(v, pw.stage)) pw.stage = firstStage(v) || 1;
+      var t = stageOf(v, pw.stage), s = v.serie;
+
+      var variants = "";
+      if (pw.rows.length > 1) {
+        variants = '<div class="power__variants" role="group" aria-label="Motorisierung wählen">' + pw.rows.map(function (r, i) {
+          return '<button type="button" data-vi="' + i + '" aria-pressed="' + (i === pw.vi) + '">' + esc(r.motor) + "</button>";
+        }).join("") + "</div>";
+      } else {
+        variants = '<p class="power__motor">' + esc(v.motor) + (v.jahre ? " · " + esc(v.jahre) : "") + "</p>";
+      }
+      var sub = pw.rows.length > 1 && v.jahre ? '<p class="power__motor">Baujahre ' + esc(v.jahre) + "</p>" : "";
+      var badge = v.beispiel ? '<p class="power__badge">Beispielwerte, nicht verbindlich</p>' : "";
+
+      var tabs = '<div class="power__tabs" role="group" aria-label="Stufe wählen">' + [1, 2, 3].map(function (k) {
+        var has = !!stageOf(v, k);
+        return '<button type="button" data-stage="' + k + '" aria-pressed="' + (k === pw.stage) + '"' + (has ? "" : " disabled") + ">Stage " + k + "</button>";
+      }).join("") + "</div>";
+
+      var stats = '<div class="power__stats">' +
+        '<div><strong>' + sign(t.ps - s.ps) + ' PS</strong><span>mehr Leistung</span></div>' +
+        '<div><strong>' + sign(t.nm - s.nm) + ' Nm</strong><span>mehr Drehmoment</span></div>' +
+        '<div><strong>' + sign(pct(s.ps, t.ps)) + ' %</strong><span>Leistung</span></div></div>';
+
+      function maxOf(key) {
+        var m = v.serie[key];
+        for (var k = 1; k <= 3; k++) { var x = stageOf(v, k); if (x && x[key] > m) m = x[key]; }
+        return m;
+      }
+      function bars(label, key, unit) {
+        var max = maxOf(key);
+        return '<div class="power__bar"><h4>' + label + "</h4>" +
+          '<div class="pb"><span>Serie</span><i><b style="width:' + (s[key] / max * 100).toFixed(1) + '%"></b></i><em>' + s[key] + " " + unit + "</em></div>" +
+          '<div class="pb pb--on"><span>Stage ' + pw.stage + '</span><i><b style="width:' + (t[key] / max * 100).toFixed(1) + '%"></b></i><em>' + t[key] + " " + unit + "</em></div></div>";
+      }
+
+      var head = "<tr><th scope=\"col\"><span class=\"visually-hidden\">Wert</span></th><th scope=\"col\">Serie</th>" + [1, 2, 3].map(function (k) { return '<th scope="col"' + (k === pw.stage ? ' class="on"' : "") + ">Stage " + k + "</th>"; }).join("") + "</tr>";
+      function row(label, key, unit) {
+        return "<tr><th scope=\"row\">" + label + "</th><td>" + s[key] + "</td>" + [1, 2, 3].map(function (k) {
+          var x = stageOf(v, k);
+          return "<td" + (k === pw.stage ? ' class="on"' : "") + ">" + (x ? x[key] + (key === "ps" ? ' <small>' + sign(pct(s.ps, x.ps)) + " %</small>" : "") : "–") + "</td>";
+        }).join("") + "</tr>";
+      }
+      var table = '<div class="power__table"><table><caption class="visually-hidden">Leistung und Drehmoment von Serie bis Stage 3, ein Strich bedeutet: Stufe auf Anfrage</caption><thead>' + head + "</thead><tbody>" + row("Leistung (PS)", "ps", "PS") + row("Drehmoment (Nm)", "nm", "Nm") + "</tbody></table></div>";
+
+      power.innerHTML = h + badge + variants + sub + tabs + stats + '<div class="power__bars">' + bars("Leistung", "ps", "PS") + bars("Drehmoment", "nm", "Nm") + "</div>" + table +
+        '<p class="power__note">' + esc(HINT) + '</p><div class="power__foot">' + cta + "</div>";
+      power.hidden = false;
+    }
+
+    if (power) {
+      power.addEventListener("click", function (e) {
+        var b = e.target.closest("button"); if (!b) return;
+        if (b.hasAttribute("data-power-cta")) { $("#anfrage").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+        if (b.hasAttribute("data-vi")) {
+          pw.vi = +b.getAttribute("data-vi");
+          var mo = $("#f-motor"); if (mo && pw.rows[pw.vi]) mo.value = pw.rows[pw.vi].motor;
+          renderPower(); return;
+        }
+        if (b.hasAttribute("data-stage")) {
+          pw.stage = +b.getAttribute("data-stage");
+          var sel = $("#f-stufe"); if (sel) sel.value = "Stage " + pw.stage;
+          renderPower();
+        }
+      });
+    }
+
+    function showPower(brand, name) {
+      var model = brand && name ? brand.models.filter(function (m) { return m.name === name; })[0] : null;
+      pw.brand = brand; pw.model = model || null; pw.vi = 0; pw.stage = 1;
+      pw.rows = model ? (POWER[brand.id + "/" + model.id] || []) : [];
+      if (pw.rows.length) pw.stage = firstStage(pw.rows[0]) || 1;
+      renderPower();
+    }
+    var curBrand = null;
+
     function selectModel(name, scroll) {
       fModell.value = name || "";
       $$("button", modelList).forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-name") === name)); });
-      if (scroll) $("#anfrage").scrollIntoView({ behavior: "smooth", block: "start" });
+      showPower(curBrand, name);
+      var target = (power && !power.hidden) ? power : $("#anfrage");
+      if (scroll) target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+    fModell.addEventListener("change", function () {
+      $$("button", modelList).forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-name") === fModell.value)); });
+      showPower(curBrand, fModell.value);
+    });
 
     function route() {
       var parts = decodeURIComponent(location.hash.replace(/^#\/?/, "")).split("/");
@@ -185,6 +289,7 @@
         return;
       }
       overview.hidden = true; view.hidden = false;
+      curBrand = brand; showPower(brand, "");
       $("#detail-name").textContent = brand.name;
       $("#detail-count").textContent = brand.models.length + " Modelle";
       $("#detail-brand-text").textContent = brand.name;
@@ -195,7 +300,7 @@
       $$("a", sidebar).forEach(function (a) { if (a.getAttribute("data-brand") === brand.id) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
       document.title = "Leistungssteigerung " + brand.name + " – CARDENO";
       var wanted = parts[1] ? brand.models.filter(function (m) { return m.id === parts[1]; })[0] : null;
-      if (wanted) { selectModel(wanted.name, false); setTimeout(function () { $("#anfrage").scrollIntoView({ block: "start" }); }, 60); }
+      if (wanted) { selectModel(wanted.name, false); setTimeout(function () { (power && !power.hidden ? power : $("#anfrage")).scrollIntoView({ block: "start" }); }, 60); }
       else window.scrollTo(0, Math.min(window.scrollY, $(".tuning-section").offsetTop - 90));
     }
     window.addEventListener("hashchange", route);
