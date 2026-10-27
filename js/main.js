@@ -76,8 +76,8 @@
       '<div class="thanks__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>' +
       '<h2 id="thanks-t"></h2><p id="thanks-d"></p>' +
       '<button type="button" class="btn">Schliessen</button></div>';
-    ov.querySelector("h2").textContent = name ? "Danke, " + name + "!" : "Anfrage erhalten!";
-    ov.querySelector("p").textContent = "Deine Nachricht ist bei mir angekommen. Ich melde mich so rasch wie möglich bei dir" + (email ? " unter " + email : "") + ".";
+    ov.querySelector("h2").textContent = "Vielen Dank für Ihre Anfrage!";
+    ov.querySelector("p").textContent = "Ihre Nachricht ist bei uns angekommen. Wir melden uns so rasch wie möglich bei Ihnen" + (email ? " unter " + email : "") + ".";
     document.body.appendChild(ov);
     document.body.classList.add("thanks-open");
     var box = ov.querySelector(".thanks__box"), close = ov.querySelector("button");
@@ -136,12 +136,12 @@
             showThanks(first, fd.get("email"));
           })
           .catch(function () {
-            if (CFG.email) { openMail(); done(false, "Das direkte Senden hat nicht geklappt. Dein E-Mail-Programm hat sich geöffnet, sende die Nachricht dort ab, oder ruf mich an."); }
-            else done(false, "Das Senden hat nicht geklappt. Bitte versuche es später nochmals oder ruf mich an.");
+            if (CFG.email) { openMail(); done(false, "Das direkte Senden hat nicht geklappt. Ihr E-Mail-Programm hat sich geöffnet. Senden Sie die Nachricht dort ab oder rufen Sie uns an."); }
+            else done(false, "Das Senden hat nicht geklappt. Bitte versuchen Sie es später nochmals oder rufen Sie uns an.");
           });
       } else if (CFG.email) {
         openMail();
-        done(true, "Dein E-Mail-Programm hat sich geöffnet. Sende die vorbereitete Nachricht dort ab.");
+        done(true, "Ihr E-Mail-Programm hat sich geöffnet. Senden Sie die vorbereitete Nachricht dort ab.");
       } else {
         done(false, "Das Formular ist noch nicht eingerichtet. Trage die E-Mail-Adresse in js/config.js ein.");
       }
@@ -197,7 +197,7 @@
     var baseTitle = document.title;
     var POWER = window.CARDENO_POWER || {};
     var STAGES = (CFG.leistungStufen && CFG.leistungStufen.length) ? CFG.leistungStufen.slice().sort() : [1];
-    var HINT = CFG.leistungHinweis || "Richtwerte. Die genauen Werte hängen von Motor, Baujahr, Zustand und Fahrzeug ab. Vor dem Auftrag sage ich dir ehrlich, was bei deinem Fahrzeug möglich ist.";
+    var HINT = CFG.leistungHinweis || "Richtwerte. Die genauen Werte hängen von Motor, Baujahr, Zustand und Fahrzeug ab. Vor dem Auftrag sagen wir Ihnen ehrlich, was bei Ihrem Fahrzeug möglich ist.";
     var stage = 1;
 
     grid.innerHTML = BRANDS.map(function (b) {
@@ -289,7 +289,7 @@
         '<p class="power__motor">Stage 1 · typische Werte nach Motorart</p><div class="power__typ">' + typ.map(function (r) {
           return "<div><h4>" + r[0] + "</h4><p><strong>" + r[1] + "</strong><span>Leistung</span></p><p><strong>" + r[2] + "</strong><span>Drehmoment</span></p></div>";
         }).join("") + "</div>" +
-        '<p class="power__note">Richtwerte für Stage 1. Wie viel es bei deinem ' + esc(title) + ' genau ist, hängt von Motor, Baujahr und Zustand ab. Schick mir die Angaben zu deinem Fahrzeug, ich nenne dir die genauen Werte und sage dir ehrlich, was möglich ist.</p>' +
+        '<p class="power__note">Richtwerte für Stage 1. Wie viel es bei Ihrem ' + esc(title) + ' genau ist, hängt von Motor, Baujahr und Zustand ab. Schicken Sie uns die Angaben zu Ihrem Fahrzeug, wir nennen Ihnen die genauen Werte und sagen Ihnen ehrlich, was möglich ist.</p>' +
         '<div class="power__foot"><button class="btn" type="button" data-power-cta><span>Anfrage für ' + esc(title) + "</span></button></div>";
       power.hidden = false;
     }
@@ -377,29 +377,29 @@
 
       if (!model) {
         title = "Leistungssteigerung " + brand.name; count = brand.models.length + " Modelle";
-        lead = "Wähle dein Modell aus. Dein Modell steht nicht in der Liste? Wähle «Anderes Modell» im Formular, ich prüfe es gerne.";
+        lead = "Wählen Sie Ihr Modell aus. Ihr Modell steht nicht in der Liste? Wählen Sie «Anderes Modell» im Formular, wir prüfen es gerne.";
         backHref = "#"; backText = "← Alle Marken";
         items = brand.models.map(function (m) { var g = gensOf(brand, m); return mcard(base + "/" + m.id, m.name, g && g.length > 1 ? g.length + " Generationen" : "", false); }).join("");
       } else if (!gens) {
         title = brand.name + " " + model.name; count = "";
-        lead = "Für dieses Modell nenne ich dir die Werte persönlich. Unten siehst du die typischen Stage-1-Richtwerte. Wähle ein anderes Modell oder frag mich direkt.";
+        lead = "Für dieses Modell nennen wir Ihnen die Werte persönlich. Unten sehen Sie die typischen Stage-1-Richtwerte. Wählen Sie ein anderes Modell oder fragen Sie uns direkt.";
         backHref = base; backText = "← " + brand.name;
         items = brand.models.map(function (m) { return mcard(base + "/" + m.id, m.name, "", m.id === model.id); }).join("");
         renderEmpty(brand.name + " " + model.name); power.setAttribute("data-title", brand.name + " " + model.name);
       } else if (!gen) {
         title = brand.name + " " + model.name; count = gens.length + " Generationen";
-        lead = "Wähle die Generation deines " + model.name + ".";
+        lead = "Wählen Sie die Generation Ihres " + model.name + ".";
         backHref = base; backText = "← " + brand.name;
         items = gens.map(function (g) { return mcard(mBase + "/" + g.id, gtitle(model, g), g.jahre || "", false); }).join("");
       } else if (!gen.motoren.length) {
         title = brand.name + " " + gfull(model, gen); count = "";
-        lead = "Für diese Generation nenne ich dir die Werte persönlich. Unten siehst du die typischen Stage-1-Richtwerte. Wähle eine andere Generation oder frag mich direkt.";
+        lead = "Für diese Generation nennen wir Ihnen die Werte persönlich. Unten sehen Sie die typischen Stage-1-Richtwerte. Wählen Sie eine andere Generation oder fragen Sie uns direkt.";
         backHref = mBase; backText = "← " + model.name + " Generationen";
         items = gens.map(function (g) { return mcard(mBase + "/" + g.id, gtitle(model, g), g.jahre || "", g.id === gen.id); }).join("");
         renderEmpty(title); power.setAttribute("data-title", title);
       } else if (!eng) {
         title = brand.name + " " + gfull(model, gen); count = gen.motoren.length + " Motoren";
-        lead = "Wähle deinen Motor. Du siehst gleich, wie viel Leistung und Drehmoment mit Stage 1 möglich sind.";
+        lead = "Wählen Sie Ihren Motor. Sie sehen gleich, wie viel Leistung und Drehmoment mit Stage 1 möglich sind.";
         backHref = single ? base : mBase; backText = single ? "← " + brand.name : "← " + model.name + " Generationen";
         cls = "cards cards--engines";
         items = gen.motoren.map(function (e) { return ecard(gBase + "/" + e.id, e); }).join("");

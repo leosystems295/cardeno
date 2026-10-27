@@ -48,7 +48,7 @@
     if (banner) return;
     banner = el("section", { "class": "ck", role: "region", "aria-label": "Cookie-Hinweis" },
       '<h2 class="ck__title">Cookies und Datenschutz</h2>' +
-      '<p class="ck__text">Diese Website funktioniert auch ohne Zusatz-Cookies. Mit deiner Erlaubnis nutze ich zusätzlich Statistik, um die Seite zu verbessern. Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>' +
+      '<p class="ck__text">Diese Website funktioniert auch ohne Zusatz-Cookies. Mit Ihrer Erlaubnis nutzen wir zusätzlich Statistik, um die Seite zu verbessern. Mehr dazu in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>' +
       '<div class="ck__btns">' +
         '<button type="button" class="btn" data-ck="all"><span>Alle akzeptieren</span></button>' +
         '<button type="button" class="btn btn--ghost" data-ck="necessary"><span>Nur notwendige</span></button>' +
@@ -69,13 +69,13 @@
     lastFocus = document.activeElement;
     var cur = read();
     var statText = CFG.analytics
-      ? "Hilft mir zu verstehen, wie die Website genutzt wird. Wird nur mit deiner Erlaubnis geladen."
-      : "Zurzeit setzt diese Website keine Statistik ein. Deine Wahl gilt, falls ich später eine einbinde.";
+      ? "Hilft uns zu verstehen, wie die Website genutzt wird. Wird nur mit Ihrer Erlaubnis geladen."
+      : "Zurzeit setzt diese Website keine Statistik ein. Ihre Wahl gilt, falls wir später eine einbinden.";
     modal = el("div", { "class": "ck-modal" },
       '<div class="ck-modal__bg" data-ck-close></div>' +
       '<div class="ck-modal__box" role="dialog" aria-modal="true" aria-labelledby="ck-m-title">' +
         '<h2 id="ck-m-title">Cookie-Einstellungen</h2>' +
-        '<div class="ck-row"><div><strong>Notwendig</strong><p>Damit die Website funktioniert und deine Auswahl hier gemerkt wird. Immer aktiv.</p></div>' +
+        '<div class="ck-row"><div><strong>Notwendig</strong><p>Damit die Website funktioniert und Ihre Auswahl hier gemerkt wird. Immer aktiv.</p></div>' +
           '<label class="ck-switch"><input type="checkbox" checked disabled><span class="ck-switch__ui" aria-hidden="true"></span><span class="visually-hidden">Notwendig, immer aktiv</span></label></div>' +
         '<div class="ck-row"><div><strong>Statistik</strong><p>' + statText + '</p></div>' +
           '<label class="ck-switch"><input type="checkbox" id="ck-stat"' + (cur && cur.statistik ? " checked" : "") + '><span class="ck-switch__ui" aria-hidden="true"></span><span class="visually-hidden">Statistik erlauben</span></label></div>' +
