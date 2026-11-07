@@ -44,7 +44,7 @@ window.CARDENO_CONFIG = {
       das E-Mail-Programm als Ersatz.
     - Externer Formular-Dienst (z. B. Formspree): vollständige https-Adresse eintragen.
   */
-  formEndpoint: "/api/kontakt",
+  formEndpoint: "https://radonjicdigital.ch/formular/cardeno",
 
   /*
     Leistungsübersicht: Welche Stufen angezeigt werden. [1] = nur Stage 1, [1, 2, 3] = alle drei.
